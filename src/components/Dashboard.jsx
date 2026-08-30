@@ -1,26 +1,51 @@
 import React, { useState, useMemo } from 'react';
 
 /**
+ * Predefined Icons catalog for Social Links management.
+ * Provides administrators with instant, visual icon selection.
+ */
+const PRESET_ICONS = [
+  { id: 'instagram', label: 'Instagram', icon: 'fa-brands fa-instagram', color: 'text-[#E1306C]' },
+  { id: 'pinterest', label: 'Pinterest', icon: 'fa-brands fa-pinterest', color: 'text-[#BD081C]' },
+  { id: 'facebook', label: 'Facebook', icon: 'fa-brands fa-facebook', color: 'text-[#1877F2]' },
+  { id: 'youtube', label: 'YouTube', icon: 'fa-brands fa-youtube', color: 'text-[#FF0000]' },
+  { id: 'tiktok', label: 'TikTok', icon: 'fa-brands fa-tiktok', color: 'text-black' },
+  { id: 'whatsapp', label: 'WhatsApp', icon: 'fa-brands fa-whatsapp', color: 'text-[#25D366]' },
+  { id: 'twitter', label: 'X (Twitter)', icon: 'fa-brands fa-x-twitter', color: 'text-black' },
+  { id: 'linkedin', label: 'LinkedIn', icon: 'fa-brands fa-linkedin', color: 'text-[#0A66C2]' },
+  { id: 'telegram', label: 'Telegram', icon: 'fa-brands fa-telegram', color: 'text-[#229ED9]' },
+  { id: 'discord', label: 'Discord', icon: 'fa-brands fa-discord', color: 'text-[#5865F2]' },
+  { id: 'envelope', label: 'Email', icon: 'fa-solid fa-envelope', color: 'text-[#C2784A]' },
+  { id: 'globe', label: 'Website', icon: 'fa-solid fa-globe', color: 'text-[#B8754F]' },
+  { id: 'phone', label: 'Phone', icon: 'fa-solid fa-phone', color: 'text-[#2E7D32]' },
+  { id: 'location', label: 'Showroom', icon: 'fa-solid fa-location-dot', color: 'text-[#C2784A]' },
+];
+
+/**
  * Dashboard Component
  *
  * Administrative management interface with:
- * 1. Quick Info Section (3 core metrics: Total Tiles, Colors Available, Supplier & Material Diversity)
- * 2. Main Dashboard with 2 Tabs:
- *    - List Tab: Table view of all tiles, search filter, View Details (TileModal), Edit Modal, Permanent Remove with safety confirmation, and Excel Export.
+ * 1. Quick Info Section (Total Tiles, Colors Available, Supplier & Material Diversity)
+ * 2. Main Dashboard with 3 Tabs:
+ *    - List Tab: Table view, search filter, View Details, Edit Modal, Permanent Remove, and Excel Export.
  *    - Tile Addition Tab: Form to upload media (Main Image, PDF Brochure, up to 4 Orientations) and fill technical specs.
+ *    - Social Links Tab: Interface to create and permanently delete social links with icon picker and live preview.
  *
  * Implements HCI UI/UX principles (immediate visual feedback, error prevention, clear hierarchy, undo/cancel controls).
  */
 export default function Dashboard({
   user,
   tiles = [],
+  socialLinks = [],
   onSelectTile,
   onAddTile,
   onUpdateTile,
   onDeleteTile,
+  onAddSocialLink,
+  onDeleteSocialLink,
   onLogout,
 }) {
-  // Active Tab: 'list' or 'add'
+  // Active Tab: 'list' | 'add' | 'social'
   const [activeTab, setActiveTab] = useState('list');
 
   // Search query for List Tab
@@ -29,6 +54,7 @@ export default function Dashboard({
   // Modals state
   const [editingTile, setEditingTile] = useState(null);
   const [tileToDelete, setTileToDelete] = useState(null);
+  const [socialToDelete, setSocialToDelete] = useState(null);
 
   // User notification toast state
   const [toastMessage, setToastMessage] = useState(null);
@@ -61,8 +87,9 @@ export default function Dashboard({
       totalColors: uniqueColors,
       totalBrands: uniqueBrands,
       totalTypes: uniqueTypes,
+      totalSocialLinks: socialLinks.length,
     };
-  }, [tiles]);
+  }, [tiles, socialLinks]);
 
   // =========================================================================
   // 2. FILTERED TILES FOR LIST TAB
@@ -83,10 +110,6 @@ export default function Dashboard({
   // =========================================================================
   // 3. EXCEL / CSV EXPORT HANDLER
   // =========================================================================
-  /**
-   * Generates and downloads a clean, Excel-compatible CSV file with UTF-8 BOM.
-   * Includes all technical specs, orientation counts, and media URLs.
-   */
   const handleExportToExcel = () => {
     if (tiles.length === 0) {
       showToast('No tiles available to export.');
@@ -148,7 +171,6 @@ export default function Dashboard({
       ].join(',');
     });
 
-    // Add UTF-8 Byte Order Mark (BOM) so Microsoft Excel opens UTF-8 characters properly
     const csvContent = '\uFEFF' + [headers.join(','), ...rows].join('\r\n');
     const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
     const url = URL.createObjectURL(blob);
@@ -166,7 +188,7 @@ export default function Dashboard({
   };
 
   // =========================================================================
-  // 4. PERMANENT DELETE HANDLER
+  // 4. DELETE HANDLERS
   // =========================================================================
   const confirmDeleteTile = () => {
     if (!tileToDelete) return;
@@ -174,6 +196,14 @@ export default function Dashboard({
     onDeleteTile(tileToDelete.id);
     setTileToDelete(null);
     showToast(`Tile "${tileName}" was permanently removed.`);
+  };
+
+  const confirmDeleteSocialLink = () => {
+    if (!socialToDelete) return;
+    const linkName = socialToDelete.name;
+    onDeleteSocialLink(socialToDelete.id);
+    setSocialToDelete(null);
+    showToast(`Social link "${linkName}" was removed.`);
   };
 
   return (
@@ -320,14 +350,15 @@ export default function Dashboard({
       </div>
 
       {/* ===================================================================== */}
-      {/* PART 2: MAIN DASHBOARD TABS (List Tab & Tile Addition Tab)            */}
+      {/* PART 2: MAIN DASHBOARD TABS (List, Tile Addition, Social Links)       */}
       {/* ===================================================================== */}
       <div className="bg-white rounded-3xl border border-[#F0E8DF] shadow-sm overflow-hidden">
         {/* Tab Headers */}
-        <div className="flex border-b border-[#F0E8DF] bg-[#FAF7F4]/60 px-6 pt-4 gap-3">
+        <div className="flex flex-wrap border-b border-[#F0E8DF] bg-[#FAF7F4]/60 px-6 pt-4 gap-2 sm:gap-3">
+          {/* Tab 1: List */}
           <button
             onClick={() => setActiveTab('list')}
-            className={`px-5 py-3 font-semibold text-xs sm:text-sm rounded-t-2xl transition-all cursor-pointer flex items-center gap-2 border-b-2 ${
+            className={`px-4 sm:px-5 py-3 font-semibold text-xs sm:text-sm rounded-t-2xl transition-all cursor-pointer flex items-center gap-2 border-b-2 ${
               activeTab === 'list'
                 ? 'bg-white text-[#C2784A] border-[#C2784A] shadow-xs'
                 : 'text-[#6B5D51] hover:text-[#3D3229] border-transparent hover:bg-white/50'
@@ -335,14 +366,15 @@ export default function Dashboard({
           >
             <i className="fa-solid fa-list-check"></i>
             <span>Tile Collection List</span>
-            <span className="ml-1.5 px-2 py-0.5 rounded-full text-[11px] bg-[#F5EDE4] text-[#A85D32] font-bold">
+            <span className="ml-1 px-2 py-0.5 rounded-full text-[10px] sm:text-[11px] bg-[#F5EDE4] text-[#A85D32] font-bold">
               {tiles.length}
             </span>
           </button>
 
+          {/* Tab 2: Add Tile */}
           <button
             onClick={() => setActiveTab('add')}
-            className={`px-5 py-3 font-semibold text-xs sm:text-sm rounded-t-2xl transition-all cursor-pointer flex items-center gap-2 border-b-2 ${
+            className={`px-4 sm:px-5 py-3 font-semibold text-xs sm:text-sm rounded-t-2xl transition-all cursor-pointer flex items-center gap-2 border-b-2 ${
               activeTab === 'add'
                 ? 'bg-white text-[#C2784A] border-[#C2784A] shadow-xs'
                 : 'text-[#6B5D51] hover:text-[#3D3229] border-transparent hover:bg-white/50'
@@ -350,6 +382,22 @@ export default function Dashboard({
           >
             <i className="fa-solid fa-plus-circle"></i>
             <span>Add New Tile</span>
+          </button>
+
+          {/* Tab 3: Social Links */}
+          <button
+            onClick={() => setActiveTab('social')}
+            className={`px-4 sm:px-5 py-3 font-semibold text-xs sm:text-sm rounded-t-2xl transition-all cursor-pointer flex items-center gap-2 border-b-2 ${
+              activeTab === 'social'
+                ? 'bg-white text-[#C2784A] border-[#C2784A] shadow-xs'
+                : 'text-[#6B5D51] hover:text-[#3D3229] border-transparent hover:bg-white/50'
+            }`}
+          >
+            <i className="fa-solid fa-share-nodes"></i>
+            <span>Social Links</span>
+            <span className="ml-1 px-2 py-0.5 rounded-full text-[10px] sm:text-[11px] bg-[#F5EDE4] text-[#A85D32] font-bold">
+              {socialLinks.length}
+            </span>
           </button>
         </div>
 
@@ -564,6 +612,22 @@ export default function Dashboard({
             />
           </div>
         )}
+
+        {/* =================================================================== */}
+        {/* TAB 3: SOCIAL LINKS MANAGEMENT TAB                                  */}
+        {/* =================================================================== */}
+        {activeTab === 'social' && (
+          <div className="p-6 sm:p-10">
+            <SocialLinksManager
+              socialLinks={socialLinks}
+              onAddLink={(newLink) => {
+                onAddSocialLink(newLink);
+                showToast(`Social link "${newLink.name}" added successfully!`);
+              }}
+              onDeleteLink={(link) => setSocialToDelete(link)}
+            />
+          </div>
+        )}
       </div>
 
       {/* ===================================================================== */}
@@ -625,6 +689,310 @@ export default function Dashboard({
           </div>
         </div>
       )}
+
+      {/* ===================================================================== */}
+      {/* SOCIAL LINK DELETE CONFIRMATION MODAL                                */}
+      {/* ===================================================================== */}
+      {socialToDelete && (
+        <div
+          onClick={() => setSocialToDelete(null)}
+          className="fixed inset-0 z-[220] bg-[#3D3229]/60 backdrop-blur-xs flex items-center justify-center p-4 animate-fade-slide-in"
+        >
+          <div
+            onClick={(e) => e.stopPropagation()}
+            className="bg-white rounded-3xl max-w-[440px] w-full p-6 sm:p-8 shadow-2xl border border-[#F0E8DF] animate-modal-slide-up text-[#3D3229]"
+          >
+            <div className="w-12 h-12 rounded-2xl bg-[#FFEBEE] text-[#C62828] flex items-center justify-center text-xl mx-auto mb-4">
+              <i className="fa-solid fa-trash-can"></i>
+            </div>
+
+            <h3 className="font-serif text-2xl font-semibold text-center mb-2">
+              Remove Social Link?
+            </h3>
+            <p className="text-xs sm:text-sm text-[#6B5D51] text-center leading-relaxed mb-6">
+              Are you sure you want to remove{' '}
+              <strong className="text-[#3D3229]">{socialToDelete.name}</strong> from the Social
+              Hub page?
+            </p>
+
+            <div className="flex items-center justify-center gap-3">
+              <button
+                type="button"
+                onClick={() => setSocialToDelete(null)}
+                className="px-5 py-2.5 bg-[#FAF7F4] hover:bg-[#F5EDE4] text-[#6B5D51] rounded-full text-xs font-semibold transition-all cursor-pointer"
+              >
+                Cancel
+              </button>
+              <button
+                type="button"
+                onClick={confirmDeleteSocialLink}
+                className="px-6 py-2.5 bg-[#E53935] hover:bg-[#C62828] text-white rounded-full text-xs font-semibold transition-all shadow-md cursor-pointer"
+              >
+                Yes, Delete Link
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
+// ===========================================================================
+// SUB-COMPONENT: SOCIAL LINKS MANAGER (CREATION & DELETION)
+// ===========================================================================
+/**
+ * SocialLinksManager component
+ *
+ * Implements HCI UI/UX principles:
+ * - Direct icon selection with visual badges
+ * - Immediate live preview of the generated social button
+ * - Clean layout splitting Creation form and Active links management
+ */
+function SocialLinksManager({ socialLinks = [], onAddLink, onDeleteLink }) {
+  const [selectedIcon, setSelectedIcon] = useState(PRESET_ICONS[0]);
+  const [customIconClass, setCustomIconClass] = useState('');
+  const [name, setName] = useState('');
+  const [href, setHref] = useState('');
+  const [error, setError] = useState('');
+
+  const activeIconClass = customIconClass.trim() || selectedIcon.icon;
+  const activeIconColor = selectedIcon.color || 'text-[#C2784A]';
+
+  /**
+   * Normalizes destination URLs so external links always open in external pages
+   * instead of being treated as relative local subpaths (e.g. 'instagram.com' -> 'https://instagram.com').
+   */
+  const formatDestinationUrl = (url) => {
+    if (!url) return '#';
+    const trimmed = url.trim();
+    if (
+      trimmed.startsWith('http://') ||
+      trimmed.startsWith('https://') ||
+      trimmed.startsWith('mailto:') ||
+      trimmed.startsWith('tel:') ||
+      trimmed.startsWith('#')
+    ) {
+      return trimmed;
+    }
+    if (trimmed.startsWith('//')) {
+      return `https:${trimmed}`;
+    }
+    return `https://${trimmed}`;
+  };
+
+  const handleCreateSubmit = (e) => {
+    e.preventDefault();
+    setError('');
+
+    if (!name.trim()) {
+      setError('Please enter a display name for the social link.');
+      return;
+    }
+
+    if (!href.trim()) {
+      setError('Please enter a destination URL (or mailto/tel).');
+      return;
+    }
+
+    const normalizedHref = formatDestinationUrl(href);
+
+    const newLink = {
+      id: String(Date.now()),
+      name: name.trim(),
+      href: normalizedHref,
+      icon: activeIconClass,
+      color: activeIconColor,
+    };
+
+    onAddLink(newLink);
+
+    // Reset input fields
+    setName('');
+    setHref('');
+    setCustomIconClass('');
+  };
+
+  return (
+    <div className="space-y-10">
+      {/* Header Info */}
+      <div className="border-b border-[#F0E8DF] pb-4">
+        <h3 className="font-serif text-2xl font-semibold text-[#3D3229]">
+          Social Links Hub Manager
+        </h3>
+        <p className="text-xs sm:text-sm text-[#6B5D51] mt-1">
+          Create new contact and social links or remove existing ones from the public Social page.
+        </p>
+      </div>
+
+      {/* SECTION 1: CREATE NEW SOCIAL LINK */}
+      <div className="bg-[#FAF7F4] rounded-3xl p-6 sm:p-8 border border-[#F0E8DF]">
+        <h4 className="text-xs font-bold uppercase tracking-wider text-[#C2784A] mb-4 flex items-center gap-2">
+          <i className="fa-solid fa-circle-plus"></i> Create New Social Link
+        </h4>
+
+        {error && (
+          <div className="mb-4 p-3 bg-[#FFF2F0] border border-[#FFCCC7] rounded-xl text-xs text-[#CF1322] flex items-center gap-2">
+            <i className="fa-solid fa-circle-exclamation"></i>
+            <span>{error}</span>
+          </div>
+        )}
+
+        <form onSubmit={handleCreateSubmit} className="space-y-6">
+          {/* Step 1: Icon Selector */}
+          <div>
+            <label className="text-[11px] font-bold uppercase tracking-wider text-[#A89885] block mb-2">
+              1. Choose An Icon *
+            </label>
+            <div className="grid grid-cols-2 sm:grid-cols-4 md:grid-cols-7 gap-2.5">
+              {PRESET_ICONS.map((preset) => {
+                const isSelected =
+                  !customIconClass && selectedIcon.id === preset.id;
+                return (
+                  <button
+                    key={preset.id}
+                    type="button"
+                    onClick={() => {
+                      setSelectedIcon(preset);
+                      setCustomIconClass('');
+                    }}
+                    className={`flex flex-col items-center justify-center p-3 rounded-2xl border-2 transition-all cursor-pointer ${
+                      isSelected
+                        ? 'bg-white border-[#C2784A] shadow-sm scale-105'
+                        : 'bg-white/60 border-[#F0E8DF] hover:bg-white hover:border-[#D4956A]'
+                    }`}
+                  >
+                    <i className={`${preset.icon} ${preset.color} text-xl mb-1`}></i>
+                    <span className="text-[10px] font-semibold text-[#6B5D51] truncate max-w-full">
+                      {preset.label}
+                    </span>
+                  </button>
+                );
+              })}
+            </div>
+
+            {/* Custom Icon override */}
+            <div className="mt-3">
+              <input
+                type="text"
+                value={customIconClass}
+                onChange={(e) => setCustomIconClass(e.target.value)}
+                placeholder="Or custom FontAwesome class (e.g. fa-brands fa-threads)..."
+                className="w-full px-3.5 py-2 border border-[#F0E8DF] rounded-xl text-xs bg-white focus:outline-none focus:border-[#C2784A]"
+              />
+            </div>
+          </div>
+
+          {/* Step 2: Name & URL Fields */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
+            <div>
+              <label className="text-[11px] font-bold uppercase tracking-wider text-[#A89885] block mb-1.5">
+                2. Display Name / Label *
+              </label>
+              <input
+                type="text"
+                required
+                value={name}
+                onChange={(e) => setName(e.target.value)}
+                placeholder="e.g. Instagram — @terratile.co"
+                className="w-full px-4 py-2.5 border-2 border-[#F0E8DF] rounded-xl text-sm bg-white focus:outline-none focus:border-[#C2784A] text-[#3D3229]"
+              />
+            </div>
+
+            <div>
+              <label className="text-[11px] font-bold uppercase tracking-wider text-[#A89885] block mb-1.5">
+                3. Destination Link (URL / mailto / tel) *
+              </label>
+              <input
+                type="text"
+                required
+                value={href}
+                onChange={(e) => setHref(e.target.value)}
+                placeholder="e.g. https://instagram.com/terratile.co"
+                className="w-full px-4 py-2.5 border-2 border-[#F0E8DF] rounded-xl text-sm bg-white focus:outline-none focus:border-[#C2784A] text-[#3D3229]"
+              />
+            </div>
+          </div>
+
+          {/* Step 3: Live Preview & Submit */}
+          <div className="pt-2 flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-4 border-t border-[#F0E8DF]">
+            <div className="flex-1 max-w-sm">
+              <span className="text-[10px] font-bold uppercase tracking-wider text-[#A89885] block mb-1.5">
+                Live Button Preview:
+              </span>
+              <div className="flex items-center justify-center gap-3 px-5 py-3 rounded-full border-2 border-[#F0E8DF] font-semibold text-xs text-[#3D3229] bg-white shadow-2xs">
+                <i className={`${activeIconClass} ${activeIconColor} text-base w-5 text-center`}></i>
+                <span className="truncate">{name || 'Button Preview Label'}</span>
+              </div>
+            </div>
+
+            <button
+              type="submit"
+              className="inline-flex items-center justify-center gap-2 px-8 py-3 bg-[#C2784A] hover:bg-[#A85D32] text-white rounded-full text-sm font-semibold transition-all shadow-md hover:shadow-lg cursor-pointer shrink-0"
+            >
+              <i className="fa-solid fa-plus text-xs"></i>
+              <span>Create Social Link</span>
+            </button>
+          </div>
+        </form>
+      </div>
+
+      {/* SECTION 2: ACTIVE SOCIAL LINKS LIST */}
+      <div>
+        <div className="flex items-center justify-between mb-4">
+          <h4 className="text-xs font-bold uppercase tracking-wider text-[#C2784A] flex items-center gap-2">
+            <i className="fa-solid fa-list"></i> Active Social Links ({socialLinks.length})
+          </h4>
+          <span className="text-xs text-[#A89885]">
+            Changes apply in real time to the public Social page
+          </span>
+        </div>
+
+        {socialLinks.length === 0 ? (
+          <div className="text-center py-12 px-4 border-2 border-dashed border-[#F0E8DF] rounded-2xl text-[#A89885]">
+            <i className="fa-solid fa-share-nodes text-3xl mb-2 text-[#E8DDD4] block"></i>
+            <p className="text-sm">No social links configured. Add your first link above!</p>
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            {socialLinks.map((link) => (
+              <div
+                key={link.id}
+                className="bg-white rounded-2xl p-4 border border-[#F0E8DF] shadow-xs flex items-center justify-between gap-3 hover:border-[#E8DDD4] transition-all"
+              >
+                <div className="flex items-center gap-3.5 min-w-0">
+                  <div className="w-10 h-10 rounded-xl bg-[#FAF7F4] border border-[#F0E8DF] flex items-center justify-center text-lg shrink-0">
+                    <i className={`${link.icon} ${link.color || 'text-[#C2784A]'}`}></i>
+                  </div>
+                  <div className="min-w-0">
+                    <h5 className="font-semibold text-sm text-[#3D3229] truncate">
+                      {link.name}
+                    </h5>
+                    <a
+                      href={formatDestinationUrl(link.href)}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-xs text-[#A89885] hover:text-[#C2784A] truncate block transition-colors"
+                      title={link.href}
+                    >
+                      {link.href}
+                    </a>
+                  </div>
+                </div>
+
+                <button
+                  type="button"
+                  onClick={() => onDeleteLink(link)}
+                  className="w-9 h-9 rounded-full bg-[#FAF7F4] hover:bg-[#FFEBEE] text-[#6B5D51] hover:text-[#C62828] border border-[#F0E8DF] hover:border-[#FFCDD2] flex items-center justify-center text-sm transition-all cursor-pointer shrink-0"
+                  title={`Delete link "${link.name}"`}
+                >
+                  <i className="fa-regular fa-trash-can"></i>
+                </button>
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
     </div>
   );
 }

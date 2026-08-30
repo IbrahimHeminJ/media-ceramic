@@ -8,6 +8,7 @@ import Login from './components/Login';
 import Dashboard from './components/Dashboard';
 import Footer from './components/Footer';
 import { tilesData } from './data/tilesData';
+import { initialSocialLinks } from './data/socialData';
 
 export default function App() {
   const [currentPage, setCurrentPage] = useState('home');
@@ -15,6 +16,9 @@ export default function App() {
 
   // Central tiles collection state (supports CRUD across Catalog & Dashboard)
   const [tiles, setTiles] = useState(tilesData);
+
+  // Central social links state (supports Add/Delete across Social page & Dashboard)
+  const [socialLinks, setSocialLinks] = useState(initialSocialLinks);
 
   // Authentication state (persisted across session refreshes)
   const [currentUser, setCurrentUser] = useState(() => {
@@ -158,6 +162,17 @@ export default function App() {
     setTiles((prev) => prev.filter((t) => t.id !== tileId));
   };
 
+  /**
+   * CRUD Handlers for Social Links management
+   */
+  const handleAddSocialLink = (newLink) => {
+    setSocialLinks((prev) => [...prev, newLink]);
+  };
+
+  const handleDeleteSocialLink = (linkId) => {
+    setSocialLinks((prev) => prev.filter((link) => link.id !== linkId));
+  };
+
   return (
     <div className="min-h-screen flex flex-col bg-[#FAF7F4] text-[#3D3229] font-sans antialiased selection:bg-[#E8D5C4]">
       {/* Navigation */}
@@ -174,7 +189,12 @@ export default function App() {
           />
         )}
 
-        {currentPage === 'social' && <Social onNavigate={navigateTo} />}
+        {currentPage === 'social' && (
+          <Social
+            socialLinks={socialLinks}
+            onNavigate={navigateTo}
+          />
+        )}
 
         {currentPage === 'login' && (
           <Login
@@ -187,10 +207,13 @@ export default function App() {
           <Dashboard
             user={currentUser}
             tiles={tiles}
+            socialLinks={socialLinks}
             onSelectTile={(tile) => setSelectedTile(tile)}
             onAddTile={handleAddTile}
             onUpdateTile={handleUpdateTile}
             onDeleteTile={handleDeleteTile}
+            onAddSocialLink={handleAddSocialLink}
+            onDeleteSocialLink={handleDeleteSocialLink}
             onLogout={handleLogout}
           />
         )}
