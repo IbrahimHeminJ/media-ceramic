@@ -7,10 +7,14 @@ import TileModal from './components/TileModal';
 import Login from './components/Login';
 import Dashboard from './components/Dashboard';
 import Footer from './components/Footer';
+import { tilesData } from './data/tilesData';
 
 export default function App() {
   const [currentPage, setCurrentPage] = useState('home');
   const [selectedTile, setSelectedTile] = useState(null);
+
+  // Central tiles collection state (supports CRUD across Catalog & Dashboard)
+  const [tiles, setTiles] = useState(tilesData);
 
   // Authentication state (persisted across session refreshes)
   const [currentUser, setCurrentUser] = useState(() => {
@@ -137,6 +141,23 @@ export default function App() {
     navigateTo('login');
   };
 
+  /**
+   * CRUD Handlers for Dashboard tile management
+   */
+  const handleAddTile = (newTile) => {
+    setTiles((prev) => [newTile, ...prev]);
+  };
+
+  const handleUpdateTile = (updatedTile) => {
+    setTiles((prev) =>
+      prev.map((t) => (t.id === updatedTile.id ? updatedTile : t))
+    );
+  };
+
+  const handleDeleteTile = (tileId) => {
+    setTiles((prev) => prev.filter((t) => t.id !== tileId));
+  };
+
   return (
     <div className="min-h-screen flex flex-col bg-[#FAF7F4] text-[#3D3229] font-sans antialiased selection:bg-[#E8D5C4]">
       {/* Navigation */}
@@ -147,7 +168,10 @@ export default function App() {
         {currentPage === 'home' && <Home onNavigate={navigateTo} />}
 
         {currentPage === 'tiles' && (
-          <Tiles onSelectTile={(tile) => setSelectedTile(tile)} />
+          <Tiles
+            tiles={tiles}
+            onSelectTile={(tile) => setSelectedTile(tile)}
+          />
         )}
 
         {currentPage === 'social' && <Social onNavigate={navigateTo} />}
@@ -160,7 +184,15 @@ export default function App() {
         )}
 
         {currentPage === 'dashboard' && (
-          <Dashboard user={currentUser} onLogout={handleLogout} />
+          <Dashboard
+            user={currentUser}
+            tiles={tiles}
+            onSelectTile={(tile) => setSelectedTile(tile)}
+            onAddTile={handleAddTile}
+            onUpdateTile={handleUpdateTile}
+            onDeleteTile={handleDeleteTile}
+            onLogout={handleLogout}
+          />
         )}
       </main>
 

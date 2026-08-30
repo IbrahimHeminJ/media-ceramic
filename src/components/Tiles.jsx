@@ -1,7 +1,7 @@
 import React, { useState, useMemo } from 'react';
 import { tilesData } from '../data/tilesData';
 
-export default function Tiles({ onSelectTile }) {
+export default function Tiles({ tiles = tilesData, onSelectTile }) {
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   const [filters, setFilters] = useState({
     size: 'all',
@@ -26,7 +26,7 @@ export default function Tiles({ onSelectTile }) {
   };
 
   const filteredTiles = useMemo(() => {
-    return tilesData.filter((tile) => {
+    return (tiles || tilesData).filter((tile) => {
       if (filters.size !== 'all' && tile.size !== filters.size) return false;
       if (filters.color !== 'all' && tile.color !== filters.color) return false;
       if (filters.type !== 'all' && tile.type !== filters.type) return false;
