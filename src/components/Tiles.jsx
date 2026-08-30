@@ -264,50 +264,14 @@ export default function Tiles({ onSelectTile }) {
                     </span>
                   )}
 
-                  {/* Tile Swatch Box */}
+                  {/* Tile Swatch Image Box - displays tile image from backend/data */}
                   <div className="aspect-square relative overflow-hidden bg-[#FAF7F4] flex items-center justify-center">
-                    <div className="w-full h-full grid grid-cols-4 grid-rows-4 gap-0.5 p-0.5">
-                      {tile.colors.map((c, i) => (
-                        <span
-                          key={i}
-                          style={{
-                            backgroundColor: c,
-                            opacity: 0.75 + (i % 3) * 0.08,
-                          }}
-                          className="rounded-[1px]"
-                        />
-                      ))}
-                      {tile.colors.map((c, i) => (
-                        <span
-                          key={i + 4}
-                          style={{
-                            backgroundColor: c,
-                            opacity: 0.8 + (i % 2) * 0.1,
-                          }}
-                          className="rounded-[1px]"
-                        />
-                      ))}
-                      {tile.colors.map((c, i) => (
-                        <span
-                          key={i + 8}
-                          style={{
-                            backgroundColor: c,
-                            opacity: 0.7 + (i % 4) * 0.07,
-                          }}
-                          className="rounded-[1px]"
-                        />
-                      ))}
-                      {tile.colors.map((c, i) => (
-                        <span
-                          key={i + 12}
-                          style={{
-                            backgroundColor: c,
-                            opacity: 0.85,
-                          }}
-                          className="rounded-[1px]"
-                        />
-                      ))}
-                    </div>
+                    <img
+                      src={tile.image || `https://picsum.photos/seed/${tile.id}-tile/600/600`}
+                      alt={tile.name}
+                      loading="lazy"
+                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                    />
                   </div>
 
                   {/* Card Body */}
