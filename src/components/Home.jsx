@@ -1,15 +1,7 @@
 import React, { useState } from 'react';
 
 export default function Home({ onNavigate }) {
-  const [formSubmitted, setFormSubmitted] = useState(false);
-
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    setFormSubmitted(true);
-    setTimeout(() => {
-      setFormSubmitted(false);
-    }, 4000);
-  };
+  const [showMap, setShowMap] = useState(false);
 
   const scrollToContact = () => {
     const el = document.getElementById('contact-section');
@@ -160,98 +152,172 @@ export default function Home({ onNavigate }) {
         </div>
       </div>
 
-      {/* CONTACT SECTION */}
+      {/* CONTACT & LOCATION SECTION */}
       <div className="max-w-[1200px] mx-auto px-4 sm:px-8 py-12 sm:py-16" id="contact-section">
         <span className="text-xs font-bold uppercase tracking-widest text-[#C2784A] block mb-2">
-          Contact
+          Contact &amp; Location
         </span>
         <h2 className="font-serif text-2xl sm:text-4xl font-semibold text-[#3D3229] tracking-tight mb-8">
-          Let's talk about your project.
+          Visit our showroom or get in touch.
         </h2>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-8 bg-white rounded-3xl p-6 sm:p-10 border border-[#F0E8DF] shadow-xs">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-8 bg-white rounded-3xl p-6 sm:p-10 border border-[#F0E8DF] shadow-xs items-stretch">
           {/* Contact Details */}
           <div className="flex flex-col justify-center space-y-6">
-            <div className="flex items-start gap-4">
-              <div className="w-11 h-11 bg-[#F5EDE4] rounded-full flex items-center justify-center text-[#A85D32] shrink-0 text-base">
+            <button
+              type="button"
+              onClick={() => setShowMap(true)}
+              className="flex items-start gap-4 text-left p-3 -m-3 rounded-2xl hover:bg-[#FAF7F4] transition-all cursor-pointer group"
+              title="Click to view on map"
+            >
+              <div className="w-11 h-11 bg-[#F5EDE4] group-hover:bg-[#E8D5C4] rounded-full flex items-center justify-center text-[#A85D32] shrink-0 text-base transition-colors">
                 <i className="fa-solid fa-location-dot"></i>
               </div>
               <div>
-                <h4 className="text-sm font-semibold text-[#3D3229]">Visit Our Showroom</h4>
+                <div className="flex items-center gap-2">
+                  <h4 className="text-sm font-semibold text-[#3D3229] group-hover:text-[#A85D32] transition-colors">
+                    Visit Our Showroom
+                  </h4>
+                  <span className="text-[11px] font-medium text-[#C2784A] bg-[#F5EDE4] px-2 py-0.5 rounded-full">
+                    View Map
+                  </span>
+                </div>
                 <p className="text-sm text-[#6B5D51] mt-0.5">
                   127 Warm Street, Design District<br />
                   Portland, OR 97201
                 </p>
               </div>
-            </div>
+            </button>
 
-            <div className="flex items-start gap-4">
+            <div className="flex items-start gap-4 p-3 -m-3">
               <div className="w-11 h-11 bg-[#F5EDE4] rounded-full flex items-center justify-center text-[#A85D32] shrink-0 text-base">
                 <i className="fa-solid fa-envelope"></i>
               </div>
               <div>
                 <h4 className="text-sm font-semibold text-[#3D3229]">Email Us</h4>
-                <p className="text-sm text-[#6B5D51] mt-0.5">hello@terratile.co</p>
+                <a
+                  href="mailto:hello@terratile.co"
+                  className="text-sm text-[#6B5D51] hover:text-[#A85D32] transition-colors mt-0.5 block"
+                >
+                  hello@terratile.co
+                </a>
               </div>
             </div>
 
-            <div className="flex items-start gap-4">
+            <div className="flex items-start gap-4 p-3 -m-3">
               <div className="w-11 h-11 bg-[#F5EDE4] rounded-full flex items-center justify-center text-[#A85D32] shrink-0 text-base">
                 <i className="fa-solid fa-phone"></i>
               </div>
               <div>
                 <h4 className="text-sm font-semibold text-[#3D3229]">Call Us</h4>
-                <p className="text-sm text-[#6B5D51] mt-0.5">+1 (503) 555-0147</p>
+                <a
+                  href="tel:+15035550147"
+                  className="text-sm text-[#6B5D51] hover:text-[#A85D32] transition-colors mt-0.5 block"
+                >
+                  +1 (503) 555-0147
+                </a>
+              </div>
+            </div>
+
+            <div className="pt-2">
+              <div className="inline-flex items-center gap-2 px-3.5 py-1.5 bg-[#FAF7F4] border border-[#F0E8DF] rounded-xl text-xs text-[#6B5D51]">
+                <i className="fa-regular fa-clock text-[#C2784A]"></i>
+                <span>Mon – Fri: 9:00 AM – 6:00 PM | Sat: 10:00 AM – 4:00 PM</span>
               </div>
             </div>
           </div>
 
-          {/* Contact Form */}
-          <form onSubmit={handleSubmit} className="space-y-4">
-            {formSubmitted && (
-              <div className="p-3 bg-[#E8D5C4]/50 border border-[#C2784A] text-[#A85D32] text-sm rounded-xl flex items-center gap-2">
-                <i className="fa-solid fa-circle-check"></i>
-                Message sent! We'll get back to you soon.
+          {/* Location Drop Pin & Interactive Map Container */}
+          <div className="min-h-[320px] sm:min-h-[360px] flex flex-col">
+            {!showMap ? (
+              <button
+                type="button"
+                onClick={() => setShowMap(true)}
+                className="w-full h-full min-h-[320px] sm:min-h-[360px] bg-gradient-to-br from-[#FAF7F4] via-[#F5EDE4] to-[#E8D5C4]/40 border-2 border-dashed border-[#D4956A]/50 hover:border-[#C2784A] rounded-2xl p-6 flex flex-col items-center justify-center text-center cursor-pointer transition-all duration-300 hover:shadow-lg hover:scale-[1.01] group relative overflow-hidden"
+              >
+                {/* Background decorative map grid lines */}
+                <div
+                  className="absolute inset-0 opacity-10 pointer-events-none"
+                  style={{
+                    backgroundImage:
+                      'radial-gradient(#3D3229 1px, transparent 1px), radial-gradient(#3D3229 1px, #FAF7F4 1px)',
+                    backgroundSize: '24px 24px',
+                    backgroundPosition: '0 0, 12px 12px',
+                  }}
+                />
+
+                {/* Animated Drop Pin */}
+                <div className="relative mb-5">
+                  <div className="w-16 h-16 bg-[#C2784A] text-white rounded-full flex items-center justify-center text-2xl shadow-lg shadow-[#C2784A]/30 group-hover:-translate-y-1 transition-transform">
+                    <i className="fa-solid fa-location-dot animate-bounce"></i>
+                  </div>
+                  <div className="w-8 h-2 bg-[#3D3229]/20 rounded-full mx-auto mt-1 blur-[1px] group-hover:scale-75 transition-transform"></div>
+                </div>
+
+                <span className="text-xs font-bold uppercase tracking-widest text-[#C2784A] mb-1">
+                  Interactive Map
+                </span>
+                <h3 className="font-serif text-xl sm:text-2xl font-semibold text-[#3D3229] mb-2">
+                  Drop Pin &amp; Explore Location
+                </h3>
+                <p className="text-sm text-[#6B5D51] max-w-[280px] mb-5">
+                  Click anywhere to open the live showroom map and find directions.
+                </p>
+
+                <span className="inline-flex items-center gap-2 px-6 py-2.5 bg-[#C2784A] text-white rounded-full font-semibold text-sm group-hover:bg-[#A85D32] transition-colors shadow-md">
+                  <i className="fa-solid fa-map-location-dot"></i> Open Map
+                </span>
+              </button>
+            ) : (
+              <div className="w-full h-full min-h-[320px] sm:min-h-[360px] flex flex-col rounded-2xl overflow-hidden border border-[#F0E8DF] bg-[#FAF7F4] shadow-inner animate-fade-slide-in">
+                {/* Map Toolbar / Actions */}
+                <div className="flex items-center justify-between px-4 py-2.5 bg-white border-b border-[#F0E8DF] text-xs">
+                  <div className="flex items-center gap-2 text-[#3D3229] font-medium">
+                    <i className="fa-solid fa-location-dot text-[#C2784A]"></i>
+                    <span className="truncate max-w-[180px] sm:max-w-none">
+                      Portland Showroom, OR 97201
+                    </span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <a
+                      href="https://maps.google.com/?q=127+Warm+Street+Portland+OR+97201"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="inline-flex items-center gap-1.5 px-3 py-1 bg-[#FAF7F4] hover:bg-[#E8D5C4] text-[#A85D32] font-semibold rounded-lg border border-[#F0E8DF] transition-colors"
+                      title="Open full map in new tab"
+                    >
+                      <i className="fa-solid fa-arrow-up-right-from-square text-[10px]"></i>
+                      <span>Directions</span>
+                    </a>
+                    <button
+                      type="button"
+                      onClick={() => setShowMap(false)}
+                      className="inline-flex items-center gap-1 px-2.5 py-1 text-[#6B5D51] hover:text-[#3D3229] hover:bg-[#FAF7F4] rounded-lg transition-colors cursor-pointer"
+                      title="Close map"
+                    >
+                      <i className="fa-solid fa-xmark"></i>
+                      <span>Close</span>
+                    </button>
+                  </div>
+                </div>
+
+                {/* Map iframe */}
+                <div className="relative flex-1 w-full min-h-[280px]">
+                  <iframe
+                    title="TERRA TILE CO. Showroom Location"
+                    src="https://maps.google.com/maps?q=127+Warm+Street+Portland+OR+97201&t=&z=14&ie=UTF8&iwloc=&output=embed"
+                    className="w-full h-full border-0 absolute inset-0"
+                    loading="lazy"
+                    allowFullScreen
+                    referrerPolicy="no-referrer-when-downgrade"
+                  ></iframe>
+                </div>
               </div>
             )}
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              <input
-                type="text"
-                placeholder="Your Name"
-                required
-                className="w-full px-4 py-3 border-2 border-[#F0E8DF] rounded-xl text-sm bg-[#FAF7F4] focus:outline-none focus:border-[#D4956A] focus:bg-[#FDFAF6] transition-all text-[#3D3229]"
-              />
-              <input
-                type="email"
-                placeholder="Email Address"
-                required
-                className="w-full px-4 py-3 border-2 border-[#F0E8DF] rounded-xl text-sm bg-[#FAF7F4] focus:outline-none focus:border-[#D4956A] focus:bg-[#FDFAF6] transition-all text-[#3D3229]"
-              />
-            </div>
-            <div>
-              <input
-                type="text"
-                placeholder="Subject"
-                className="w-full px-4 py-3 border-2 border-[#F0E8DF] rounded-xl text-sm bg-[#FAF7F4] focus:outline-none focus:border-[#D4956A] focus:bg-[#FDFAF6] transition-all text-[#3D3229]"
-              />
-            </div>
-            <div>
-              <textarea
-                placeholder="Tell us about your project..."
-                required
-                rows={4}
-                className="w-full px-4 py-3 border-2 border-[#F0E8DF] rounded-xl text-sm bg-[#FAF7F4] focus:outline-none focus:border-[#D4956A] focus:bg-[#FDFAF6] transition-all text-[#3D3229] resize-y"
-              ></textarea>
-            </div>
-            <button
-              type="submit"
-              className="inline-flex items-center gap-2 px-7 py-3 bg-[#C2784A] text-white rounded-full font-semibold text-sm hover:bg-[#A85D32] transition-all shadow-md cursor-pointer"
-            >
-              Send Message <i className="fa-solid fa-paper-plane text-xs"></i>
-            </button>
-          </form>
+          </div>
         </div>
       </div>
     </section>
   );
 }
+
