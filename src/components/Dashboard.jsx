@@ -1001,8 +1001,70 @@ function SocialLinksManager({ socialLinks = [], onAddLink, onDeleteLink }) {
 // SUB-COMPONENT: TILE ADDITION / EDIT FORM
 // ===========================================================================
 /**
+ * Default fallback labels assigned sequentially to newly added mockups.
+ */
+const DEFAULT_MOCKUP_LABELS = [
+  'Room Installation',
+  'Bathroom Mockup',
+  'Kitchen View',
+  'Close-up Detail',
+];
+
+/**
+ * Normalizes initial installation mockup data into structured objects { label, image }.
+ *
+ * Supports:
+ * - Direct mockup objects: { label: string, image: string }
+ * - Seed identifiers: 'carrara-room' -> converted to Picsum mockup image URL
+ * - Web/Data URLs: 'https://...' or 'data:image/...'
+ *
+ * @param {Object|null} initialData - Tile data if in edit mode
+ * @returns {Array<{label: string, image: string}>} - Array of normalized mockup objects (0 to 4)
+ */
+const getInitialMockups = (initialData) => {
+  if (!initialData) return [];
+  const list = Array.isArray(initialData.mockups)
+    ? initialData.mockups
+    : Array.isArray(initialData.mockupSeeds)
+    ? initialData.mockupSeeds
+    : [];
+
+  if (list.length === 0) return [];
+
+  return list.slice(0, 4).map((item, index) => {
+    if (typeof item === 'object' && item !== null) {
+      return {
+        label:
+          item.label ||
+          item.name ||
+          DEFAULT_MOCKUP_LABELS[index] ||
+          `Mockup ${index + 1}`,
+        image: item.image || '',
+      };
+    }
+    if (typeof item === 'string') {
+      const isFullUrl =
+        item.startsWith('http://') ||
+        item.startsWith('https://') ||
+        item.startsWith('data:');
+      return {
+        label: DEFAULT_MOCKUP_LABELS[index] || `Mockup ${index + 1}`,
+        image: isFullUrl
+          ? item
+          : `https://picsum.photos/seed/${item}/800/600`,
+      };
+    }
+    return {
+      label: DEFAULT_MOCKUP_LABELS[index] || `Mockup ${index + 1}`,
+      image: '',
+    };
+  });
+};
+
+/**
  * TileForm handles creation and editing of tiles with all required fields,
- * image uploads (as data URLs or web URLs), PDF brochure, and up to 4 orientations.
+ * image uploads (as data URLs or web URLs), PDF brochure, up to 4 orientations,
+ * and up to 4 installation mockups (minimum 0, maximum 4).
  */
 function TileForm({ initialData = null, onSubmit, onCancel }) {
   const [name, setName] = useState(initialData?.name || '');
@@ -1038,6 +1100,9 @@ function TileForm({ initialData = null, onSubmit, onCancel }) {
           { name: 'Diagonal 45°', image: 'https://picsum.photos/seed/pattern-2/500/500' },
         ]
   );
+
+  // Up to 4 installation mockups (minimum 0, maximum 4)
+  const [mockups, setMockups] = useState(() => getInitialMockups(initialData));
 
   const [formError, setFormError] = useState('');
 
@@ -1077,6 +1142,41 @@ function TileForm({ initialData = null, onSubmit, onCancel }) {
     );
   };
 
+  /**
+   * Add a new installation mockup scene (capped at 4 maximum).
+   * Automatically assigns sequential default label and placeholder seed.
+   */
+  const handleAddMockup = () => {
+    if (mockups.length >= 4) return;
+    const nextIdx = mockups.length;
+    setMockups((prev) => [
+      ...prev,
+      {
+        label:
+          DEFAULT_MOCKUP_LABELS[nextIdx] ||
+          `Installation Scene ${nextIdx + 1}`,
+        image: `https://picsum.photos/seed/mockup-${Date.now()}-${nextIdx + 1}/800/600`,
+      },
+    ]);
+  };
+
+  /**
+   * Remove an installation mockup at a given index.
+   * Allows removing all mockups down to 0.
+   */
+  const handleRemoveMockup = (index) => {
+    setMockups((prev) => prev.filter((_, i) => i !== index));
+  };
+
+  /**
+   * Update specific field ('label' or 'image') of a mockup at a given index.
+   */
+  const handleUpdateMockup = (index, field, value) => {
+    setMockups((prev) =>
+      prev.map((item, i) => (i === index ? { ...item, [field]: value } : item))
+    );
+  };
+
   // Form submission handler
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -1108,12 +1208,9 @@ function TileForm({ initialData = null, onSubmit, onCancel }) {
       image: image.trim(),
       pdfUrl: pdfUrl.trim() ? pdfUrl.trim() : null,
       orientations: orientations.slice(0, 4),
+      mockups: mockups.slice(0, 4),
+      mockupSeeds: mockups.slice(0, 4),
       colors: initialData?.colors || ['#f5f2ed', '#ece6db', '#e0d8cc', '#d4c9b8'],
-      mockupSeeds: initialData?.mockupSeeds || [
-        `room-${Date.now()}`,
-        `bath-${Date.now()}`,
-        `kitchen-${Date.now()}`,
-      ],
     };
 
     onSubmit(newTileData);
@@ -1489,6 +1586,126 @@ function TileForm({ initialData = null, onSubmit, onCancel }) {
             </div>
           ))}
         </div>
+      </div>
+
+      {/* SECTION 6: INSTALLATION MOCKUPS (MIN 0, MAX 4 SCENE IMAGES) */}
+      <div>
+        <div className="flex items-center justify-between mb-4">
+          <div>
+            <h4 className="text-xs font-bold uppercase tracking-wider text-[#C2784A] flex items-center gap-2">
+              <i className="fa-solid fa-images"></i> Installation Mockups (Max 4 Images)
+            </h4>
+            <span className="text-[11px] text-[#A89885] mt-0.5 block">
+              Provide real-world room, kitchen, bathroom, or architectural mockups.
+            </span>
+          </div>
+
+          {mockups.length < 4 && (
+            <button
+              type="button"
+              onClick={handleAddMockup}
+              className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full bg-[#F5EDE4] hover:bg-[#E8D5C4] text-[#A85D32] text-xs font-semibold transition-all cursor-pointer shadow-2xs"
+            >
+              <i className="fa-solid fa-plus text-[10px]"></i>
+              <span>Add Mockup ({mockups.length}/4)</span>
+            </button>
+          )}
+        </div>
+
+        {mockups.length === 0 ? (
+          <div className="text-center py-8 px-4 border-2 border-dashed border-[#F0E8DF] rounded-2xl text-[#A89885]">
+            <i className="fa-regular fa-images text-2xl mb-1.5 text-[#E8DDD4] block"></i>
+            <p className="text-xs font-medium text-[#6B5D51]">
+              No installation mockups added (0/4).
+            </p>
+            <p className="text-[11px] mt-0.5">
+              Click &quot;Add Mockup&quot; above to attach room or detail scene previews.
+            </p>
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+            {mockups.map((item, idx) => (
+              <div
+                key={idx}
+                className="bg-[#FAF7F4] rounded-2xl p-4 border border-[#F0E8DF] relative group flex flex-col justify-between"
+              >
+                <div>
+                  <div className="aspect-[4/3] rounded-xl overflow-hidden bg-white border border-[#F0E8DF] mb-3 relative">
+                    <img
+                      src={
+                        item.image ||
+                        'https://via.placeholder.com/400x300?text=No+Image'
+                      }
+                      alt={item.label || `Mockup ${idx + 1}`}
+                      className="w-full h-full object-cover"
+                      onError={(e) => {
+                        e.currentTarget.src =
+                          'https://via.placeholder.com/400x300?text=Invalid+Image+URL';
+                      }}
+                    />
+                    <label
+                      className="absolute bottom-2 right-2 bg-[#3D3229]/80 hover:bg-[#C2784A] text-white p-1.5 rounded-lg text-[10px] cursor-pointer backdrop-blur-xs transition-all"
+                      title="Upload local image file"
+                    >
+                      <i className="fa-solid fa-camera"></i>
+                      <input
+                        type="file"
+                        accept="image/*"
+                        onChange={(e) =>
+                          handleFileUpload(e, (dataUrl) =>
+                            handleUpdateMockup(idx, 'image', dataUrl)
+                          )
+                        }
+                        className="hidden"
+                      />
+                    </label>
+                  </div>
+
+                  <div className="space-y-2">
+                    <div>
+                      <label className="text-[10px] font-bold uppercase tracking-wider text-[#A89885] block mb-1">
+                        Mockup Label
+                      </label>
+                      <input
+                        type="text"
+                        value={item.label}
+                        onChange={(e) =>
+                          handleUpdateMockup(idx, 'label', e.target.value)
+                        }
+                        placeholder="e.g. Room Installation"
+                        className="w-full px-2.5 py-1.5 border border-[#F0E8DF] rounded-lg text-xs bg-white focus:outline-none focus:border-[#C2784A] font-medium text-[#3D3229]"
+                      />
+                    </div>
+
+                    <div>
+                      <label className="text-[10px] font-bold uppercase tracking-wider text-[#A89885] block mb-1">
+                        Image URL / Source
+                      </label>
+                      <input
+                        type="text"
+                        value={item.image}
+                        onChange={(e) =>
+                          handleUpdateMockup(idx, 'image', e.target.value)
+                        }
+                        placeholder="Image URL or upload"
+                        className="w-full px-2.5 py-1.5 border border-[#F0E8DF] rounded-lg text-xs bg-white focus:outline-none focus:border-[#C2784A] text-[#6B5D51]"
+                      />
+                    </div>
+                  </div>
+                </div>
+
+                <button
+                  type="button"
+                  onClick={() => handleRemoveMockup(idx)}
+                  className="absolute top-2 right-2 w-6 h-6 rounded-full bg-white text-[#C62828] border border-[#FFCCC7] hover:bg-[#FFEBEE] flex items-center justify-center text-[10px] shadow-2xs transition-all cursor-pointer"
+                  title="Remove mockup"
+                >
+                  <i className="fa-solid fa-xmark"></i>
+                </button>
+              </div>
+            ))}
+          </div>
+        )}
       </div>
 
       {/* FORM ACTION BUTTONS */}

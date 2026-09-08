@@ -79,7 +79,7 @@ export default function Tiles({ tiles = tilesData, onSelectTile }) {
           onClick={() => setSidebarCollapsed(!sidebarCollapsed)}
           className="inline-flex items-center gap-2 px-5 py-2 bg-white border-2 border-[#F0E8DF] rounded-full font-semibold text-sm text-[#3D3229] hover:border-[#D4956A] hover:bg-[#FDFAF6] hover:text-[#A85D32] transition-all cursor-pointer shadow-xs"
         >
-          <i className="fa-solid fa-sliders text-sm"></i> {t('tiles.toggleFilters', 'Toggle Filters')}
+          <i className="fa-solid fa-sliders text-sm"></i> Toggle Filters
         </button>
       </div>
 
