@@ -59,8 +59,12 @@ export default function TileModal({ tile, onClose }) {
     ? tile.orientations.slice(0, 4)
     : [];
 
-  // Mockups list (supports mockupSeeds array or mockup image objects)
-  const mockupsList = tile.mockupSeeds || tile.mockups || [];
+  // Mockups list (supports tile.mockups objects array or legacy mockupSeeds array)
+  const mockupsList = Array.isArray(tile.mockups)
+    ? tile.mockups
+    : Array.isArray(tile.mockupSeeds)
+    ? tile.mockupSeeds
+    : [];
 
   return (
     <>
@@ -232,22 +236,27 @@ export default function TileModal({ tile, onClose }) {
               </div>
             )}
 
-            {/* INSTALLATION MOCKUPS (Clickable for full screen) */}
-            {mockupsList.length > 0 && (
-              <div className="mb-4">
-                <h4 className="text-xs font-bold uppercase tracking-wider text-[#3D3229] mb-3 flex items-center gap-1.5">
-                  <span>🖼️</span> Installation Mockups
-                </h4>
+            {/* INSTALLATION MOCKUPS (Clickable for full screen or graceful none-state) */}
+            <div className="mb-4">
+              <h4 className="text-xs font-bold uppercase tracking-wider text-[#3D3229] mb-3 flex items-center gap-1.5">
+                <span>🖼️</span> Installation Mockups
+              </h4>
+              {mockupsList.length > 0 ? (
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
                   {mockupsList.map((mockup, i) => {
                     const imgSrc =
                       typeof mockup === 'object'
                         ? mockup.image
-                        : typeof mockup === 'string' && mockup.startsWith('http')
+                        : typeof mockup === 'string' &&
+                          (mockup.startsWith('http://') ||
+                            mockup.startsWith('https://') ||
+                            mockup.startsWith('data:'))
                         ? mockup
                         : `https://picsum.photos/seed/${mockup}/800/600`;
                     const label =
-                      (typeof mockup === 'object' ? mockup.label : null) ||
+                      (typeof mockup === 'object'
+                        ? mockup.label || mockup.name
+                        : null) ||
                       mockupLabels[i] ||
                       `Mockup ${i + 1}`;
 
@@ -280,8 +289,18 @@ export default function TileModal({ tile, onClose }) {
                     );
                   })}
                 </div>
-              </div>
-            )}
+              ) : (
+                <div className="py-5 px-4 rounded-2xl bg-[#FAF7F4] border border-[#F0E8DF] text-center text-[#A89885] flex flex-col items-center justify-center gap-1">
+                  <i className="fa-regular fa-image text-lg text-[#D4956A]"></i>
+                  <span className="text-xs font-medium text-[#6B5D51]">
+                    No installation mockups available for this tile.
+                  </span>
+                  <span className="text-[11px] text-[#A89885]">
+                    Room scenes and installation renders will appear here once added.
+                  </span>
+                </div>
+              )}
+            </div>
           </div>
         </div>
       </div>
