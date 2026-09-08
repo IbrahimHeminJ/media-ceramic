@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 
 /**
  * Login Component
@@ -8,6 +9,7 @@ import React, { useState } from 'react';
  * Includes password recovery contact info and handles redirection to Dashboard upon successful authentication.
  */
 export default function Login({ onLoginSuccess, onNavigateHome }) {
+  const { t } = useTranslation();
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [errorMessage, setErrorMessage] = useState('');
@@ -23,7 +25,7 @@ export default function Login({ onLoginSuccess, onNavigateHome }) {
 
     // Basic validation
     if (!username.trim() || !password.trim()) {
-      setErrorMessage('Please enter both username and password.');
+      setErrorMessage(t('login.errorEmpty', 'Please enter both username and password.'));
       return;
     }
 
@@ -40,7 +42,7 @@ export default function Login({ onLoginSuccess, onNavigateHome }) {
         onLoginSuccess({ username: username.trim() });
       } else {
         setIsSubmitting(false);
-        setErrorMessage('Invalid username or password. Please try again.');
+        setErrorMessage(t('login.errorInvalid', 'Invalid username or password. Please try again.'));
       }
     }, 400);
   };
@@ -55,13 +57,13 @@ export default function Login({ onLoginSuccess, onNavigateHome }) {
             <i className="fa-solid fa-lock"></i>
           </div>
           <span className="text-xs font-bold uppercase tracking-widest text-[#C2784A] block mb-1">
-            Staff Portal
+            {t('login.badge', 'Staff Portal')}
           </span>
           <h2 className="font-serif text-2xl sm:text-3xl font-semibold text-[#3D3229] tracking-tight">
-            Dashboard Login
+            {t('login.title', 'Dashboard Login')}
           </h2>
           <p className="text-xs sm:text-sm text-[#6B5D51] mt-1.5">
-            Enter your credentials to access the management panel
+            {t('login.subtitle', 'Enter your credentials to access the management panel')}
           </p>
         </div>
 
@@ -77,7 +79,7 @@ export default function Login({ onLoginSuccess, onNavigateHome }) {
         <form onSubmit={handleLoginSubmit} className="space-y-4">
           <div>
             <label className="text-[11px] font-bold uppercase tracking-wider text-[#A89885] block mb-1.5">
-              Username
+              {t('login.username', 'Username')}
             </label>
             <div className="relative">
               <span className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-[#A89885]">
@@ -87,7 +89,7 @@ export default function Login({ onLoginSuccess, onNavigateHome }) {
                 type="text"
                 value={username}
                 onChange={(e) => setUsername(e.target.value)}
-                placeholder="Enter username (e.g. admin)"
+                placeholder={t('login.usernamePlaceholder', 'Enter username (e.g. admin)')}
                 autoComplete="username"
                 required
                 className="w-full pl-10 pr-4 py-2.5 sm:py-3 border-2 border-[#F0E8DF] rounded-xl text-sm bg-[#FAF7F4] focus:outline-none focus:border-[#C2784A] focus:bg-[#FDFAF6] transition-all text-[#3D3229]"
@@ -97,7 +99,7 @@ export default function Login({ onLoginSuccess, onNavigateHome }) {
 
           <div>
             <label className="text-[11px] font-bold uppercase tracking-wider text-[#A89885] block mb-1.5">
-              Password
+              {t('login.password', 'Password')}
             </label>
             <div className="relative">
               <span className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-[#A89885]">
@@ -107,7 +109,7 @@ export default function Login({ onLoginSuccess, onNavigateHome }) {
                 type="password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                placeholder="Enter password"
+                placeholder={t('login.passwordPlaceholder', 'Enter password')}
                 autoComplete="current-password"
                 required
                 className="w-full pl-10 pr-4 py-2.5 sm:py-3 border-2 border-[#F0E8DF] rounded-xl text-sm bg-[#FAF7F4] focus:outline-none focus:border-[#C2784A] focus:bg-[#FDFAF6] transition-all text-[#3D3229]"
@@ -124,11 +126,11 @@ export default function Login({ onLoginSuccess, onNavigateHome }) {
             {isSubmitting ? (
               <>
                 <i className="fa-solid fa-circle-notch fa-spin text-sm"></i>
-                <span>Signing in...</span>
+                <span>{t('login.signingIn', 'Signing in...')}</span>
               </>
             ) : (
               <>
-                <span>Sign In</span>
+                <span>{t('login.signIn', 'Sign In')}</span>
                 <i className="fa-solid fa-arrow-right text-xs"></i>
               </>
             )}
@@ -138,7 +140,7 @@ export default function Login({ onLoginSuccess, onNavigateHome }) {
         {/* Forgot Password Recovery Notice */}
         <div className="mt-6 pt-5 border-t border-[#F0E8DF] text-center">
           <p className="text-xs text-[#6B5D51] leading-relaxed">
-            Contact us in case of forgetting your password:{' '}
+            {t('login.forgotPassword', 'Contact us in case of forgetting your password:')}{' '}
             <a
               href="tel:+15035550147"
               className="font-semibold text-[#C2784A] hover:underline whitespace-nowrap block sm:inline mt-0.5 sm:mt-0"
@@ -156,7 +158,7 @@ export default function Login({ onLoginSuccess, onNavigateHome }) {
               onClick={onNavigateHome}
               className="text-xs text-[#A89885] hover:text-[#3D3229] transition-colors cursor-pointer"
             >
-              ← Back to Main Site
+              {t('login.backToSite', '← Back to Main Site')}
             </button>
           </div>
         )}

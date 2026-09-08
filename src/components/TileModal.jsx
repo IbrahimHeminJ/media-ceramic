@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 
 /**
  * TileModal Component
@@ -12,6 +13,7 @@ import React, { useEffect, useState } from 'react';
  * - Full-screen lightbox viewer for main image, mockups, and patterns
  */
 export default function TileModal({ tile, onClose }) {
+  const { t } = useTranslation();
   // State for the full-screen lightbox image viewer
   const [fullscreenImage, setFullscreenImage] = useState(null);
 
@@ -44,10 +46,10 @@ export default function TileModal({ tile, onClose }) {
   if (!tile) return null;
 
   const mockupLabels = [
-    'Room Installation',
-    'Bathroom Mockup',
-    'Kitchen View',
-    'Close-up Detail',
+    t('modal.mockups.roomInstallation', 'Room Installation'),
+    t('modal.mockups.bathroomMockup', 'Bathroom Mockup'),
+    t('modal.mockups.kitchenView', 'Kitchen View'),
+    t('modal.mockups.closeUpDetail', 'Close-up Detail'),
   ];
 
   // Main tile image source (ready for future backend property integration)
@@ -101,10 +103,10 @@ export default function TileModal({ tile, onClose }) {
                 })
               }
               className="absolute bottom-4 right-4 bg-[#3D3229]/80 hover:bg-[#C2784A] text-white px-3 py-1.5 rounded-full text-xs font-medium backdrop-blur-xs flex items-center gap-1.5 shadow-md transition-all cursor-pointer opacity-90 group-hover:opacity-100"
-              title="View in Full Screen"
+              title={t('modal.clickToViewFullscreen', 'Click to view full screen')}
             >
               <i className="fa-solid fa-expand text-xs"></i>
-              <span>Fullscreen</span>
+              <span>{t('modal.fullscreen', 'Fullscreen')}</span>
             </button>
           </div>
 
@@ -125,7 +127,7 @@ export default function TileModal({ tile, onClose }) {
               <button
                 onClick={onClose}
                 className="shrink-0 w-10 h-10 rounded-full bg-[#FAF7F4] border-2 border-[#F0E8DF] flex items-center justify-center text-lg text-[#3D3229] hover:bg-[#F5EDE4] hover:border-[#D4956A] hover:text-[#A85D32] transition-all cursor-pointer shadow-xs"
-                title="Close Modal"
+                title={t('modal.close', 'Close Modal')}
               >
                 <i className="fa-solid fa-xmark"></i>
               </button>
@@ -181,7 +183,7 @@ export default function TileModal({ tile, onClose }) {
                   className="inline-flex items-center gap-2.5 px-5 py-2.5 bg-[#FDFAF6] border-2 border-[#E8DDD4] hover:border-[#C2784A] text-[#3D3229] hover:text-[#C2784A] rounded-full text-xs sm:text-sm font-semibold transition-all shadow-xs hover:shadow-md cursor-pointer group"
                 >
                   <i className="fa-solid fa-file-pdf text-[#C2784A] group-hover:scale-110 transition-transform text-base"></i>
-                  <span>Download Specification Sheet (PDF)</span>
+                  <span>{t('modal.downloadPdf', 'Download Specification Sheet (PDF)')}</span>
                   <i className="fa-solid fa-arrow-down text-xs text-[#A89885] group-hover:text-[#C2784A] transition-colors"></i>
                 </a>
               </div>
@@ -191,7 +193,7 @@ export default function TileModal({ tile, onClose }) {
             {orientationsList.length > 0 && (
               <div className="mb-8">
                 <h4 className="text-xs font-bold uppercase tracking-wider text-[#3D3229] mb-3 flex items-center gap-1.5">
-                  <span>📐</span> Orientation Patterns
+                  <span>📐</span> {t('modal.orientationPatterns', 'Orientation Patterns')}
                 </h4>
                 <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-4">
                   {orientationsList.map((pattern, idx) => {
@@ -213,7 +215,7 @@ export default function TileModal({ tile, onClose }) {
                             })
                           }
                           className="aspect-square rounded-xl border-2 border-[#F0E8DF] hover:border-[#C2784A] overflow-hidden bg-[#FAF7F4] shadow-xs cursor-pointer relative transition-all"
-                          title={`Click to expand ${name}`}
+                          title={`${t('modal.clickToExpand', 'Click to expand')} ${name}`}
                         >
                           <img
                             src={imgSrc}
@@ -236,7 +238,7 @@ export default function TileModal({ tile, onClose }) {
             {mockupsList.length > 0 && (
               <div className="mb-4">
                 <h4 className="text-xs font-bold uppercase tracking-wider text-[#3D3229] mb-3 flex items-center gap-1.5">
-                  <span>🖼️</span> Installation Mockups
+                  <span>🖼️</span> {t('modal.installationMockups', 'Installation Mockups')}
                 </h4>
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
                   {mockupsList.map((mockup, i) => {
@@ -262,7 +264,7 @@ export default function TileModal({ tile, onClose }) {
                           })
                         }
                         className="aspect-[4/3] rounded-xl overflow-hidden bg-[#F5EDE4] relative border border-[#F0E8DF] shadow-xs group cursor-pointer"
-                        title={`Click to view full screen: ${label}`}
+                        title={`${t('modal.clickToViewFullscreen', 'Click to view full screen')}: ${label}`}
                       >
                         <img
                           src={imgSrc}
@@ -297,10 +299,10 @@ export default function TileModal({ tile, onClose }) {
             <button
               onClick={() => setFullscreenImage(null)}
               className="flex items-center gap-2 px-4 py-2 rounded-full bg-white/15 hover:bg-[#C2784A] text-white border border-white/25 hover:border-[#C2784A] text-xs sm:text-sm font-semibold backdrop-blur-sm transition-all cursor-pointer shadow-lg"
-              title="Exit Fullscreen (Esc)"
+              title={`${t('modal.exitFullscreen', 'Exit Fullscreen')} (Esc)`}
             >
               <i className="fa-solid fa-xmark text-base"></i>
-              <span>Exit Fullscreen</span>
+              <span>{t('modal.exitFullscreen', 'Exit Fullscreen')}</span>
             </button>
           </div>
 

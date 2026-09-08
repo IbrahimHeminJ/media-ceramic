@@ -3,6 +3,8 @@
 @theme {
   --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
   --font-serif: 'Playfair Display', serif;
+  --font-arabic: 'Cairo', 'Noto Sans Arabic', sans-serif;
+  --font-kurdish: 'Vazirmatn', 'Noto Sans Arabic', sans-serif;
 
   --color-cream: #FAF7F4;
   --color-warm-white: #FDFAF6;
@@ -69,3 +71,48 @@ body {
   line-height: 1.6;
   min-height: 100vh;
 }
+
+/* =========================================================================
+   LANGUAGE SPECIFIC TYPOGRAPHY
+   ========================================================================= */
+
+/* Arabic (ar) -> Cairo */
+html[lang="ar"] {
+  --font-sans: 'Cairo', 'Noto Sans Arabic', sans-serif;
+  --font-serif: 'Cairo', 'Noto Sans Arabic', sans-serif;
+  font-family: 'Cairo', 'Noto Sans Arabic', sans-serif;
+}
+
+html[lang="ar"] body,
+html[lang="ar"] button,
+html[lang="ar"] input,
+html[lang="ar"] textarea,
+html[lang="ar"] select,
+html[lang="ar"] .font-sans,
+html[lang="ar"] .font-serif {
+  font-family: 'Cairo', 'Noto Sans Arabic', sans-serif !important;
+}
+
+/* Kurdish (ku) -> Vazirmatn */
+html[lang="ku"] {
+  --font-sans: 'Vazirmatn', 'Noto Sans Arabic', sans-serif;
+  --font-serif: 'Vazirmatn', 'Noto Sans Arabic', sans-serif;
+  font-family: 'Vazirmatn', 'Noto Sans Arabic', sans-serif;
+}
+
+html[lang="ku"] body,
+html[lang="ku"] button,
+html[lang="ku"] input,
+html[lang="ku"] textarea,
+html[lang="ku"] select,
+html[lang="ku"] .font-sans,
+html[lang="ku"] .font-serif {
+  font-family: 'Vazirmatn', 'Noto Sans Arabic', sans-serif !important;
+}
+
+/* RTL Typography Optimization: Avoid breaking cursive Arabic & Kurdish ligatures */
+html[dir="rtl"] [class*="tracking-"],
+html[lang="ar"] [class*="tracking-"],
+html[lang="ku"] [class*="tracking-"] {
+  letter-spacing: 0 !important;
+}

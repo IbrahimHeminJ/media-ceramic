@@ -1,0 +1,175 @@
+{
+  "common": {
+    "brandName": "TERRA TILE",
+    "companyName": "TERRA TILE CO.",
+    "tagline": "Warm floors, beautiful walls.",
+    "loading": "Loading...",
+    "error": "An error occurred",
+    "close": "Close",
+    "cancel": "Cancel",
+    "save": "Save",
+    "delete": "Delete",
+    "edit": "Edit",
+    "back": "Back"
+  },
+  "nav": {
+    "brand": "TERRA TILE",
+    "home": "Home",
+    "tiles": "Tiles",
+    "social": "Social"
+  },
+  "hero": {
+    "badge": "Premium Floor & Wall Tiling",
+    "titleLine1": "Warm floors,",
+    "titleLine2": "beautiful",
+    "titleLine2Highlight": "walls",
+    "description": "We craft timeless surfaces that bring warmth and character to every space. From natural stone to artisanal porcelain — each tile tells a story of craftsmanship.",
+    "exploreCollection": "Explore Collection",
+    "getInTouch": "Get in Touch"
+  },
+  "story": {
+    "badge": "Our Story",
+    "title": "Rooted in craftsmanship, designed for modern living.",
+    "paragraph": "TERRA TILE CO. was born from a deep appreciation for natural materials and timeless design. We source the finest clays, stones, and minerals to create tiles that don't just cover surfaces — they transform them. Every piece is a marriage of tradition and innovation, crafted to bring warmth underfoot and beauty to every wall."
+  },
+  "vision": {
+    "badge": "Our Vision",
+    "title": "What we stand for.",
+    "sustainable": {
+      "title": "Sustainable Sourcing",
+      "description": "We partner with ethical quarries and use recycled materials wherever possible to minimize our environmental footprint."
+    },
+    "artisanal": {
+      "title": "Artisanal Quality",
+      "description": "Each tile undergoes rigorous quality checks. We believe in slow production and lasting beauty over mass manufacturing."
+    },
+    "minimalism": {
+      "title": "Warm Minimalism",
+      "description": "Our designs embrace clean lines and warm tones — creating spaces that feel both modern and deeply inviting."
+    }
+  },
+  "trusted": {
+    "badge": "Trusted By"
+  },
+  "contact": {
+    "badge": "Contact & Location",
+    "title": "Visit our showroom or get in touch.",
+    "visitShowroom": "Visit Our Showroom",
+    "viewMap": "View Map",
+    "addressLine1": "127 Warm Street, Design District",
+    "addressLine2": "Portland, OR 97201",
+    "emailUs": "Email Us",
+    "callUs": "Call Us",
+    "hours": "Mon – Fri: 9:00 AM – 6:00 PM | Sat: 10:00 AM – 4:00 PM",
+    "interactiveMap": "Interactive Map",
+    "dropPin": "Drop Pin & Explore Location",
+    "dropPinPrompt": "Click anywhere to open the live showroom map and find directions.",
+    "openMap": "Open Map",
+    "showroomLocation": "Portland Showroom, OR 97201",
+    "directions": "Directions",
+    "closeMap": "Close"
+  },
+  "tiles": {
+    "badge": "Our Collection",
+    "title": "Find your perfect tile.",
+    "toggleFilters": "Toggle Filters",
+    "search": "Search",
+    "searchPlaceholder": "Search by name...",
+    "size": "Size",
+    "allSizes": "All Sizes",
+    "color": "Color",
+    "allColors": "All Colors",
+    "colors": {
+      "white": "White",
+      "beige": "Beige",
+      "gray": "Gray",
+      "brown": "Brown",
+      "terracotta": "Terracotta"
+    },
+    "type": "Type",
+    "allTypes": "All Types",
+    "types": {
+      "porcelain": "Porcelain",
+      "ceramic": "Ceramic",
+      "marble": "Marble",
+      "terrazzo": "Terrazzo"
+    },
+    "brand": "Brand",
+    "allBrands": "All Brands",
+    "resetFilters": "Reset Filters",
+    "noMatchTitle": "No tiles match your filters.",
+    "noMatchSubtitle": "Try adjusting your criteria.",
+    "clickForDetails": "Click for details",
+    "badges": {
+      "new": "new",
+      "featured": "featured",
+      "popular": "popular"
+    }
+  },
+  "modal": {
+    "fullscreen": "Fullscreen",
+    "close": "Close Modal",
+    "downloadPdf": "Download Specification Sheet (PDF)",
+    "orientationPatterns": "Orientation Patterns",
+    "installationMockups": "Installation Mockups",
+    "exitFullscreen": "Exit Fullscreen",
+    "clickToExpand": "Click to expand",
+    "clickToViewFullscreen": "Click to view full screen",
+    "mockups": {
+      "roomInstallation": "Room Installation",
+      "bathroomMockup": "Bathroom Mockup",
+      "kitchenView": "Kitchen View",
+      "closeUpDetail": "Close-up Detail"
+    }
+  },
+  "social": {
+    "title": "TERRA TILE CO.",
+    "handle": "@terratile.co",
+    "bio1": "Warm floors, beautiful walls. Crafted for living. 🌿",
+    "bio2": "Premium tiling — showroom in Portland, OR.",
+    "empty": "No social links configured."
+  },
+  "footer": {
+    "poweredBy": "Powered By",
+    "copyright": "© 2026 TERRA TILE CO. — Warm floors, beautiful walls. All rights reserved."
+  },
+  "login": {
+    "badge": "Staff Portal",
+    "title": "Dashboard Login",
+    "subtitle": "Enter your credentials to access the management panel",
+    "username": "Username",
+    "usernamePlaceholder": "Enter username (e.g. admin)",
+    "password": "Password",
+    "passwordPlaceholder": "Enter password",
+    "signIn": "Sign In",
+    "signingIn": "Signing in...",
+    "errorEmpty": "Please enter both username and password.",
+    "errorInvalid": "Invalid username or password. Please try again.",
+    "forgotPassword": "Contact us in case of forgetting your password:",
+    "backToSite": "← Back to Main Site"
+  },
+  "dashboard": {
+    "title": "Staff Dashboard",
+    "logout": "Logout",
+    "quickInfo": {
+      "totalTiles": "Total Tiles in Catalog",
+      "colorsAvailable": "Colors Available",
+      "suppliers": "Suppliers & Brands",
+      "materials": "Materials & Types",
+      "socialLinks": "Active Social Links"
+    },
+    "tabs": {
+      "catalog": "Tile Catalog",
+      "addTile": "Add New Tile",
+      "socialLinks": "Social Links"
+    },
+    "actions": {
+      "searchPlaceholder": "Search tiles by name, brand, color, or type...",
+      "exportExcel": "Export to Excel",
+      "addNew": "+ Add Tile",
+      "viewDetails": "View Details",
+      "edit": "Edit",
+      "delete": "Delete"
+    }
+  }
+}

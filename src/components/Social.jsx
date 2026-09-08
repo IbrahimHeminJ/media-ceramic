@@ -1,4 +1,5 @@
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 import { initialSocialLinks } from '../data/socialData';
 
 /**
@@ -36,6 +37,8 @@ const formatDestinationUrl = (url) => {
  * Dynamically maps `socialLinks` passed from state.
  */
 export default function Social({ socialLinks = initialSocialLinks, onNavigate }) {
+  const { t } = useTranslation();
+
   return (
     <section className="animate-fade-slide-in flex-1 flex items-center justify-center py-12 sm:py-16 px-4">
       <div className="bg-white rounded-3xl p-8 sm:p-12 text-center max-w-[440px] w-full shadow-xl border border-[#F0E8DF]">
@@ -46,18 +49,18 @@ export default function Social({ socialLinks = initialSocialLinks, onNavigate })
 
         {/* Title & Bio */}
         <h2 className="font-serif text-2xl sm:text-3xl font-semibold text-[#3D3229] mb-1">
-          TERRA TILE CO.
+          {t('social.title', 'TERRA TILE CO.')}
         </h2>
-        <p className="text-[#C2784A] font-semibold text-sm mb-3">@terratile.co</p>
+        <p className="text-[#C2784A] font-semibold text-sm mb-3">{t('social.handle', '@terratile.co')}</p>
         <p className="text-[#6B5D51] text-sm leading-relaxed mb-8">
-          Warm floors, beautiful walls. Crafted for living. 🌿<br />
-          Premium tiling — showroom in Portland, OR.
+          {t('social.bio1', 'Warm floors, beautiful walls. Crafted for living. 🌿')}<br />
+          {t('social.bio2', 'Premium tiling — showroom in Portland, OR.')}
         </p>
 
         {/* Dynamic Social Buttons Stack */}
         <div className="flex flex-col gap-3">
           {socialLinks.length === 0 ? (
-            <p className="text-sm text-[#A89885] py-4">No social links configured.</p>
+            <p className="text-sm text-[#A89885] py-4">{t('social.empty', 'No social links configured.')}</p>
           ) : (
             socialLinks.map((link, idx) => {
               const className =

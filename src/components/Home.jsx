@@ -1,6 +1,8 @@
 import React, { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 
 export default function Home({ onNavigate }) {
+  const { t } = useTranslation();
   const [showMap, setShowMap] = useState(false);
 
   const scrollToContact = () => {
@@ -24,16 +26,16 @@ export default function Home({ onNavigate }) {
         />
 
         <span className="inline-block px-4 py-1.5 bg-[#E8D5C4] text-[#A85D32] rounded-full text-xs font-semibold uppercase tracking-wider mb-6">
-          Premium Floor &amp; Wall Tiling
+          {t('hero.badge', 'Premium Floor & Wall Tiling')}
         </span>
 
         <h1 className="font-serif text-4xl sm:text-6xl md:text-7xl font-semibold text-[#3D3229] tracking-tight leading-[1.15] mb-5">
-          Warm floors,<br />
-          beautiful <span className="text-[#C2784A] italic">walls</span>.
+          {t('hero.titleLine1', 'Warm floors,')}<br />
+          {t('hero.titleLine2', 'beautiful')} <span className="text-[#C2784A] italic">{t('hero.titleLine2Highlight', 'walls')}</span>.
         </h1>
 
         <p className="text-base sm:text-lg text-[#6B5D51] max-w-[560px] mx-auto mb-8 leading-relaxed">
-          We craft timeless surfaces that bring warmth and character to every space. From natural stone to artisanal porcelain — each tile tells a story of craftsmanship.
+          {t('hero.description', 'We craft timeless surfaces that bring warmth and character to every space. From natural stone to artisanal porcelain — each tile tells a story of craftsmanship.')}
         </p>
 
         <div className="flex flex-wrap justify-center gap-3 sm:gap-4">
@@ -41,13 +43,13 @@ export default function Home({ onNavigate }) {
             onClick={() => onNavigate('tiles')}
             className="inline-flex items-center gap-2 px-7 py-3 bg-[#C2784A] text-white rounded-full font-semibold text-sm sm:text-base hover:bg-[#A85D32] transition-all shadow-md hover:shadow-lg hover:-translate-y-0.5 cursor-pointer"
           >
-            Explore Collection <i className="fa-solid fa-arrow-right text-xs"></i>
+            {t('hero.exploreCollection', 'Explore Collection')} <i className="fa-solid fa-arrow-right text-xs"></i>
           </button>
           <button
             onClick={scrollToContact}
             className="inline-flex items-center gap-2 px-7 py-3 bg-transparent border-2 border-[#E8DDD4] text-[#3D3229] rounded-full font-semibold text-sm sm:text-base hover:border-[#C2784A] hover:text-[#A85D32] hover:bg-[#FDFAF6] transition-all cursor-pointer"
           >
-            Get in Touch
+            {t('hero.getInTouch', 'Get in Touch')}
           </button>
         </div>
       </div>
@@ -73,13 +75,13 @@ export default function Home({ onNavigate }) {
           {/* Text Content */}
           <div>
             <span className="text-xs font-bold uppercase tracking-widest text-[#C2784A] block mb-2">
-              Our Story
+              {t('story.badge', 'Our Story')}
             </span>
             <h2 className="font-serif text-2xl sm:text-4xl font-semibold text-[#3D3229] tracking-tight mb-4">
-              Rooted in craftsmanship, designed for modern living.
+              {t('story.title', 'Rooted in craftsmanship, designed for modern living.')}
             </h2>
             <p className="text-[#6B5D51] text-base leading-relaxed">
-              TERRA TILE CO. was born from a deep appreciation for natural materials and timeless design. We source the finest clays, stones, and minerals to create tiles that don't just cover surfaces — they transform them. Every piece is a marriage of tradition and innovation, crafted to bring warmth underfoot and beauty to every wall.
+              {t('story.paragraph', "TERRA TILE CO. was born from a deep appreciation for natural materials and timeless design. We source the finest clays, stones, and minerals to create tiles that don't just cover surfaces — they transform them. Every piece is a marriage of tradition and innovation, crafted to bring warmth underfoot and beauty to every wall.")}
             </p>
           </div>
         </div>
@@ -89,10 +91,10 @@ export default function Home({ onNavigate }) {
       <div className="max-w-[1200px] mx-auto px-4 sm:px-8 my-8">
         <div className="bg-[#FDFAF6] rounded-3xl p-6 sm:p-14 border border-[#F0E8DF] shadow-xs">
           <span className="text-xs font-bold uppercase tracking-widest text-[#C2784A] block mb-2">
-            Our Vision
+            {t('vision.badge', 'Our Vision')}
           </span>
           <h2 className="font-serif text-2xl sm:text-4xl font-semibold text-[#3D3229] tracking-tight mb-8">
-            What we stand for.
+            {t('vision.title', 'What we stand for.')}
           </h2>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -101,10 +103,10 @@ export default function Home({ onNavigate }) {
                 <i className="fa-solid fa-seedling"></i>
               </div>
               <h3 className="font-serif text-xl text-[#3D3229] font-medium mb-2">
-                Sustainable Sourcing
+                {t('vision.sustainable.title', 'Sustainable Sourcing')}
               </h3>
               <p className="text-sm text-[#6B5D51] leading-relaxed">
-                We partner with ethical quarries and use recycled materials wherever possible to minimize our environmental footprint.
+                {t('vision.sustainable.description', 'We partner with ethical quarries and use recycled materials wherever possible to minimize our environmental footprint.')}
               </p>
             </div>
 
@@ -113,10 +115,10 @@ export default function Home({ onNavigate }) {
                 <i className="fa-solid fa-hand-sparkles"></i>
               </div>
               <h3 className="font-serif text-xl text-[#3D3229] font-medium mb-2">
-                Artisanal Quality
+                {t('vision.artisanal.title', 'Artisanal Quality')}
               </h3>
               <p className="text-sm text-[#6B5D51] leading-relaxed">
-                Each tile undergoes rigorous quality checks. We believe in slow production and lasting beauty over mass manufacturing.
+                {t('vision.artisanal.description', 'Each tile undergoes rigorous quality checks. We believe in slow production and lasting beauty over mass manufacturing.')}
               </p>
             </div>
 
@@ -125,10 +127,10 @@ export default function Home({ onNavigate }) {
                 <i className="fa-solid fa-house-chimney"></i>
               </div>
               <h3 className="font-serif text-xl text-[#3D3229] font-medium mb-2">
-                Warm Minimalism
+                {t('vision.minimalism.title', 'Warm Minimalism')}
               </h3>
               <p className="text-sm text-[#6B5D51] leading-relaxed">
-                Our designs embrace clean lines and warm tones — creating spaces that feel both modern and deeply inviting.
+                {t('vision.minimalism.description', 'Our designs embrace clean lines and warm tones — creating spaces that feel both modern and deeply inviting.')}
               </p>
             </div>
           </div>
@@ -138,7 +140,7 @@ export default function Home({ onNavigate }) {
       {/* TRUSTED BY SECTION */}
       <div className="max-w-[860px] mx-auto px-4 py-12 text-center">
         <span className="text-xs font-bold uppercase tracking-widest text-[#C2784A] block mb-6">
-          Trusted By
+          {t('trusted.badge', 'Trusted By')}
         </span>
         <div className="flex flex-wrap items-center justify-center gap-8 sm:gap-12">
           {['HAVEN HOMES', 'STUDIO OAK', 'THE DESIGN CO.', 'URBAN NEST', 'CRAFT & CLAY', 'MODERN LIVING'].map((brand, i) => (
@@ -155,10 +157,10 @@ export default function Home({ onNavigate }) {
       {/* CONTACT & LOCATION SECTION */}
       <div className="max-w-[1200px] mx-auto px-4 sm:px-8 py-12 sm:py-16" id="contact-section">
         <span className="text-xs font-bold uppercase tracking-widest text-[#C2784A] block mb-2">
-          Contact &amp; Location
+          {t('contact.badge', 'Contact & Location')}
         </span>
         <h2 className="font-serif text-2xl sm:text-4xl font-semibold text-[#3D3229] tracking-tight mb-8">
-          Visit our showroom or get in touch.
+          {t('contact.title', 'Visit our showroom or get in touch.')}
         </h2>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8 bg-white rounded-3xl p-6 sm:p-10 border border-[#F0E8DF] shadow-xs items-stretch">
@@ -168,7 +170,7 @@ export default function Home({ onNavigate }) {
               type="button"
               onClick={() => setShowMap(true)}
               className="flex items-start gap-4 text-left p-3 -m-3 rounded-2xl hover:bg-[#FAF7F4] transition-all cursor-pointer group"
-              title="Click to view on map"
+              title={t('contact.viewMap', 'View Map')}
             >
               <div className="w-11 h-11 bg-[#F5EDE4] group-hover:bg-[#E8D5C4] rounded-full flex items-center justify-center text-[#A85D32] shrink-0 text-base transition-colors">
                 <i className="fa-solid fa-location-dot"></i>
@@ -176,15 +178,15 @@ export default function Home({ onNavigate }) {
               <div>
                 <div className="flex items-center gap-2">
                   <h4 className="text-sm font-semibold text-[#3D3229] group-hover:text-[#A85D32] transition-colors">
-                    Visit Our Showroom
+                    {t('contact.visitShowroom', 'Visit Our Showroom')}
                   </h4>
                   <span className="text-[11px] font-medium text-[#C2784A] bg-[#F5EDE4] px-2 py-0.5 rounded-full">
-                    View Map
+                    {t('contact.viewMap', 'View Map')}
                   </span>
                 </div>
                 <p className="text-sm text-[#6B5D51] mt-0.5">
-                  127 Warm Street, Design District<br />
-                  Portland, OR 97201
+                  {t('contact.addressLine1', '127 Warm Street, Design District')}<br />
+                  {t('contact.addressLine2', 'Portland, OR 97201')}
                 </p>
               </div>
             </button>
@@ -194,7 +196,7 @@ export default function Home({ onNavigate }) {
                 <i className="fa-solid fa-envelope"></i>
               </div>
               <div>
-                <h4 className="text-sm font-semibold text-[#3D3229]">Email Us</h4>
+                <h4 className="text-sm font-semibold text-[#3D3229]">{t('contact.emailUs', 'Email Us')}</h4>
                 <a
                   href="mailto:hello@terratile.co"
                   className="text-sm text-[#6B5D51] hover:text-[#A85D32] transition-colors mt-0.5 block"
@@ -209,7 +211,7 @@ export default function Home({ onNavigate }) {
                 <i className="fa-solid fa-phone"></i>
               </div>
               <div>
-                <h4 className="text-sm font-semibold text-[#3D3229]">Call Us</h4>
+                <h4 className="text-sm font-semibold text-[#3D3229]">{t('contact.callUs', 'Call Us')}</h4>
                 <a
                   href="tel:+15035550147"
                   className="text-sm text-[#6B5D51] hover:text-[#A85D32] transition-colors mt-0.5 block"
@@ -222,7 +224,7 @@ export default function Home({ onNavigate }) {
             <div className="pt-2">
               <div className="inline-flex items-center gap-2 px-3.5 py-1.5 bg-[#FAF7F4] border border-[#F0E8DF] rounded-xl text-xs text-[#6B5D51]">
                 <i className="fa-regular fa-clock text-[#C2784A]"></i>
-                <span>Mon – Fri: 9:00 AM – 6:00 PM | Sat: 10:00 AM – 4:00 PM</span>
+                <span>{t('contact.hours', 'Mon – Fri: 9:00 AM – 6:00 PM | Sat: 10:00 AM – 4:00 PM')}</span>
               </div>
             </div>
           </div>
@@ -255,17 +257,17 @@ export default function Home({ onNavigate }) {
                 </div>
 
                 <span className="text-xs font-bold uppercase tracking-widest text-[#C2784A] mb-1">
-                  Interactive Map
+                  {t('contact.interactiveMap', 'Interactive Map')}
                 </span>
                 <h3 className="font-serif text-xl sm:text-2xl font-semibold text-[#3D3229] mb-2">
-                  Drop Pin &amp; Explore Location
+                  {t('contact.dropPin', 'Drop Pin & Explore Location')}
                 </h3>
                 <p className="text-sm text-[#6B5D51] max-w-[280px] mb-5">
-                  Click anywhere to open the live showroom map and find directions.
+                  {t('contact.dropPinPrompt', 'Click anywhere to open the live showroom map and find directions.')}
                 </p>
 
                 <span className="inline-flex items-center gap-2 px-6 py-2.5 bg-[#C2784A] text-white rounded-full font-semibold text-sm group-hover:bg-[#A85D32] transition-colors shadow-md">
-                  <i className="fa-solid fa-map-location-dot"></i> Open Map
+                  <i className="fa-solid fa-map-location-dot"></i> {t('contact.openMap', 'Open Map')}
                 </span>
               </button>
             ) : (
@@ -275,7 +277,7 @@ export default function Home({ onNavigate }) {
                   <div className="flex items-center gap-2 text-[#3D3229] font-medium">
                     <i className="fa-solid fa-location-dot text-[#C2784A]"></i>
                     <span className="truncate max-w-[180px] sm:max-w-none">
-                      Portland Showroom, OR 97201
+                      {t('contact.showroomLocation', 'Portland Showroom, OR 97201')}
                     </span>
                   </div>
                   <div className="flex items-center gap-2">
@@ -287,16 +289,16 @@ export default function Home({ onNavigate }) {
                       title="Open full map in new tab"
                     >
                       <i className="fa-solid fa-arrow-up-right-from-square text-[10px]"></i>
-                      <span>Directions</span>
+                      <span>{t('contact.directions', 'Directions')}</span>
                     </a>
                     <button
                       type="button"
                       onClick={() => setShowMap(false)}
                       className="inline-flex items-center gap-1 px-2.5 py-1 text-[#6B5D51] hover:text-[#3D3229] hover:bg-[#FAF7F4] rounded-lg transition-colors cursor-pointer"
-                      title="Close map"
+                      title={t('contact.closeMap', 'Close')}
                     >
                       <i className="fa-solid fa-xmark"></i>
-                      <span>Close</span>
+                      <span>{t('contact.closeMap', 'Close')}</span>
                     </button>
                   </div>
                 </div>

@@ -1,7 +1,9 @@
 import React, { useState, useMemo } from 'react';
+import { useTranslation } from 'react-i18next';
 import { tilesData } from '../data/tilesData';
 
 export default function Tiles({ tiles = tilesData, onSelectTile }) {
+  const { t } = useTranslation();
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   const [filters, setFilters] = useState({
     size: 'all',
@@ -43,16 +45,16 @@ export default function Tiles({ tiles = tilesData, onSelectTile }) {
       }
       return true;
     });
-  }, [filters]);
+  }, [filters, tiles]);
 
   const sizeOptions = ['all', '30x30', '60x60', '30x60', '20x120'];
   const colorOptions = [
-    { value: 'all', label: 'All Colors' },
-    { value: 'white', label: 'White', hex: '#f5f2ed' },
-    { value: 'beige', label: 'Beige', hex: '#d9c8b4' },
-    { value: 'gray', label: 'Gray', hex: '#5c554d' },
-    { value: 'brown', label: 'Brown', hex: '#b8957a' },
-    { value: 'terracotta', label: 'Terracotta', hex: '#c2784a' },
+    { value: 'all', label: t('tiles.allColors', 'All Colors') },
+    { value: 'white', label: t('tiles.colors.white', 'White'), hex: '#f5f2ed' },
+    { value: 'beige', label: t('tiles.colors.beige', 'Beige'), hex: '#d9c8b4' },
+    { value: 'gray', label: t('tiles.colors.gray', 'Gray'), hex: '#5c554d' },
+    { value: 'brown', label: t('tiles.colors.brown', 'Brown'), hex: '#b8957a' },
+    { value: 'terracotta', label: t('tiles.colors.terracotta', 'Terracotta'), hex: '#c2784a' },
   ];
   const typeOptions = ['all', 'porcelain', 'ceramic', 'marble', 'terrazzo'];
   const brandOptions = [
@@ -68,16 +70,16 @@ export default function Tiles({ tiles = tilesData, onSelectTile }) {
       {/* HEADER */}
       <div className="text-center mb-6 sm:mb-8">
         <span className="text-xs font-bold uppercase tracking-widest text-[#C2784A] block mb-2">
-          Our Collection
+          {t('tiles.badge', 'Our Collection')}
         </span>
         <h2 className="font-serif text-3xl sm:text-5xl font-semibold text-[#3D3229] tracking-tight mb-4">
-          Find your perfect tile.
+          {t('tiles.title', 'Find your perfect tile.')}
         </h2>
         <button
           onClick={() => setSidebarCollapsed(!sidebarCollapsed)}
           className="inline-flex items-center gap-2 px-5 py-2 bg-white border-2 border-[#F0E8DF] rounded-full font-semibold text-sm text-[#3D3229] hover:border-[#D4956A] hover:bg-[#FDFAF6] hover:text-[#A85D32] transition-all cursor-pointer shadow-xs"
         >
-          <i className="fa-solid fa-sliders text-sm"></i> Toggle Filters
+          <i className="fa-solid fa-sliders text-sm"></i> {t('tiles.toggleFilters', 'Toggle Filters')}
         </button>
       </div>
 
@@ -94,11 +96,11 @@ export default function Tiles({ tiles = tilesData, onSelectTile }) {
           {/* Search Filter */}
           <div className="mb-6">
             <label className="text-[11px] font-bold uppercase tracking-wider text-[#A89885] block mb-2">
-              Search
+              {t('tiles.search', 'Search')}
             </label>
             <input
               type="text"
-              placeholder="Search by name..."
+              placeholder={t('tiles.searchPlaceholder', 'Search by name...')}
               value={filters.name}
               onChange={(e) => handleFilterChange('name', e.target.value)}
               className="w-full px-4 py-2.5 border-2 border-[#F0E8DF] rounded-full text-sm bg-[#FAF7F4] focus:outline-none focus:border-[#D4956A] text-[#3D3229] transition-all"
@@ -108,12 +110,12 @@ export default function Tiles({ tiles = tilesData, onSelectTile }) {
           {/* Size Filter */}
           <div className="mb-6">
             <label className="text-[11px] font-bold uppercase tracking-wider text-[#A89885] block mb-2">
-              Size
+              {t('tiles.size', 'Size')}
             </label>
             <div className="space-y-1.5">
               {sizeOptions.map((sz) => {
                 const isActive = filters.size === sz;
-                const label = sz === 'all' ? 'All Sizes' : `${sz.replace('x', '×')} cm`;
+                const label = sz === 'all' ? t('tiles.allSizes', 'All Sizes') : `${sz.replace('x', '×')} cm`;
                 return (
                   <button
                     key={sz}
@@ -134,7 +136,7 @@ export default function Tiles({ tiles = tilesData, onSelectTile }) {
           {/* Color Filter */}
           <div className="mb-6">
             <label className="text-[11px] font-bold uppercase tracking-wider text-[#A89885] block mb-2">
-              Color
+              {t('tiles.color', 'Color')}
             </label>
             <div className="space-y-1.5">
               {colorOptions.map((c) => {
@@ -165,17 +167,19 @@ export default function Tiles({ tiles = tilesData, onSelectTile }) {
           {/* Type Filter */}
           <div className="mb-6">
             <label className="text-[11px] font-bold uppercase tracking-wider text-[#A89885] block mb-2">
-              Type
+              {t('tiles.type', 'Type')}
             </label>
             <div className="space-y-1.5">
-              {typeOptions.map((t) => {
-                const isActive = filters.type === t;
+              {typeOptions.map((tKey) => {
+                const isActive = filters.type === tKey;
                 const label =
-                  t === 'all' ? 'All Types' : t.charAt(0).toUpperCase() + t.slice(1);
+                  tKey === 'all'
+                    ? t('tiles.allTypes', 'All Types')
+                    : t(`tiles.types.${tKey}`, tKey.charAt(0).toUpperCase() + tKey.slice(1));
                 return (
                   <button
-                    key={t}
-                    onClick={() => handleFilterChange('type', t)}
+                    key={tKey}
+                    onClick={() => handleFilterChange('type', tKey)}
                     className={`w-full text-left px-4 py-2 rounded-full text-xs font-medium border-2 transition-all cursor-pointer ${
                       isActive
                         ? 'bg-[#C2784A] text-white border-[#C2784A] font-semibold'
@@ -192,14 +196,14 @@ export default function Tiles({ tiles = tilesData, onSelectTile }) {
           {/* Brand Filter */}
           <div className="mb-6">
             <label className="text-[11px] font-bold uppercase tracking-wider text-[#A89885] block mb-2">
-              Brand
+              {t('tiles.brand', 'Brand')}
             </label>
             <div className="space-y-1.5">
               {brandOptions.map((b) => {
                 const isActive = filters.brand === b;
                 const label =
                   b === 'all'
-                    ? 'All Brands'
+                    ? t('tiles.allBrands', 'All Brands')
                     : b
                         .split(' ')
                         .map((w) => w.charAt(0).toUpperCase() + w.slice(1))
@@ -226,7 +230,7 @@ export default function Tiles({ tiles = tilesData, onSelectTile }) {
             onClick={resetFilters}
             className="w-full flex items-center justify-center gap-2 px-4 py-2.5 rounded-full border-2 border-[#E8DDD4] bg-[#FAF7F4] text-[#6B5D51] hover:bg-[#E8D5C4] hover:text-[#A85D32] hover:border-[#D4956A] font-semibold text-xs transition-all cursor-pointer"
           >
-            <i className="fa-solid fa-rotate-left"></i> Reset Filters
+            <i className="fa-solid fa-rotate-left"></i> {t('tiles.resetFilters', 'Reset Filters')}
           </button>
         </aside>
 
@@ -236,8 +240,8 @@ export default function Tiles({ tiles = tilesData, onSelectTile }) {
             <div className="text-center py-16 px-4 text-[#A89885]">
               <i className="fa-solid fa-magnifying-glass text-4xl mb-4 text-[#E8DDD4] block"></i>
               <p className="text-base">
-                No tiles match your filters.<br />
-                Try adjusting your criteria.
+                {t('tiles.noMatchTitle', 'No tiles match your filters.')}<br />
+                {t('tiles.noMatchSubtitle', 'Try adjusting your criteria.')}
               </p>
             </div>
           ) : (
@@ -247,7 +251,7 @@ export default function Tiles({ tiles = tilesData, onSelectTile }) {
                   key={tile.id}
                   onClick={() => onSelectTile(tile)}
                   className="group bg-white rounded-2xl overflow-hidden cursor-pointer border border-[#F0E8DF] hover:border-[#E8DDD4] shadow-xs hover:shadow-xl hover:-translate-y-1.5 transition-all duration-300 relative"
-                  title="Click for details"
+                  title={t('tiles.clickForDetails', 'Click for details')}
                 >
                   {/* Badge */}
                   {tile.badge && (
@@ -260,7 +264,7 @@ export default function Tiles({ tiles = tilesData, onSelectTile }) {
                           : 'bg-[#E53935]'
                       }`}
                     >
-                      {tile.badge}
+                      {t(`tiles.badges.${tile.badge}`, tile.badge)}
                     </span>
                   )}
 
