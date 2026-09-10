@@ -18,12 +18,12 @@ export default function Navbar({ activePage, onNavigate }) {
         <button
           onClick={() => onNavigate('home')}
           className="flex items-center gap-2 font-serif text-xl sm:text-2xl font-semibold text-[#3D3229] hover:text-[#C2784A] transition-colors cursor-pointer"
-          title={t('common.companyName', 'TERRA TILE CO.')}
+          title={t('common.companyName', 'Media Ceramic CO.')}
         >
           <span className="w-7 h-7 sm:w-8 sm:h-8 bg-[#C2784A] rounded-lg flex items-center justify-center text-white text-xs sm:text-sm shadow-sm">
             <i className="fa-solid fa-cube"></i>
           </span>
-          <span>{t('nav.brand', 'TERRA TILE')}</span>
+          <span>{t('nav.brand', 'Media Ceramic')}</span>
         </button>
 
         {/* Right Section: Desktop Nav links + Language Switcher */}

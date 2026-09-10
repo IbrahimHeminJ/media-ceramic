@@ -2,9 +2,205 @@ import React, { useState, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { tilesData } from '../data/tilesData';
 
+/**
+ * Filter controls component.
+ * Can be rendered vertically (for desktop sidebar) or in a multi-column grid (for mobile/tablet expandable section).
+ */
+function FilterControls({
+  filters,
+  onFilterChange,
+  onReset,
+  sizeOptions,
+  colorOptions,
+  typeOptions,
+  brandOptions,
+  t,
+  layout = 'vertical',
+  showResetButton = true,
+}) {
+  const isGrid = layout === 'grid';
+
+  return (
+    <div className={isGrid ? 'grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6' : 'space-y-6'}>
+      {/* Search Filter */}
+      <div className={isGrid ? 'sm:col-span-2 md:col-span-3' : ''}>
+        <label className="text-[11px] font-bold uppercase tracking-wider text-[#A89885] block mb-2">
+          {t('tiles.search', 'Search')}
+        </label>
+        <div className="relative">
+          <input
+            type="text"
+            placeholder={t('tiles.searchPlaceholder', 'Search by name...')}
+            value={filters.name}
+            onChange={(e) => onFilterChange('name', e.target.value)}
+            className="w-full ps-10 pe-10 py-2.5 border-2 border-[#F0E8DF] rounded-full text-sm bg-[#FAF7F4] focus:outline-none focus:border-[#D4956A] text-[#3D3229] transition-all"
+          />
+          <span className="absolute start-3.5 top-1/2 -translate-y-1/2 text-[#A89885] pointer-events-none text-xs">
+            <i className="fa-solid fa-magnifying-glass"></i>
+          </span>
+          {filters.name && (
+            <button
+              type="button"
+              onClick={() => onFilterChange('name', '')}
+              aria-label={t('tiles.clearSearch', 'Clear search')}
+              className="absolute end-3 top-1/2 -translate-y-1/2 w-6 h-6 rounded-full bg-[#E8DDD4] hover:bg-[#D4956A] hover:text-white text-[#6B5D51] flex items-center justify-center text-xs transition-colors cursor-pointer"
+            >
+              <i className="fa-solid fa-xmark"></i>
+            </button>
+          )}
+        </div>
+      </div>
+
+      {/* Size Filter */}
+      <div>
+        <label className="text-[11px] font-bold uppercase tracking-wider text-[#A89885] block mb-2">
+          {t('tiles.size', 'Size')}
+        </label>
+        <div className="space-y-1.5">
+          {sizeOptions.map((sz) => {
+            const isActive = filters.size === sz;
+            const label =
+              sz === 'all'
+                ? t('tiles.allSizes', 'All Sizes')
+                : `${sz.replace('x', '×')} cm`;
+            return (
+              <button
+                key={sz}
+                type="button"
+                onClick={() => onFilterChange('size', sz)}
+                className={`w-full text-start px-4 py-2 rounded-full text-xs font-medium border-2 transition-all cursor-pointer ${
+                  isActive
+                    ? 'bg-[#C2784A] text-white border-[#C2784A] font-semibold shadow-xs'
+                    : 'bg-white text-[#6B5D51] border-[#F0E8DF] hover:border-[#D4956A] hover:text-[#A85D32] hover:bg-[#FDFAF6]'
+                }`}
+              >
+                {label}
+              </button>
+            );
+          })}
+        </div>
+      </div>
+
+      {/* Color Filter */}
+      <div>
+        <label className="text-[11px] font-bold uppercase tracking-wider text-[#A89885] block mb-2">
+          {t('tiles.color', 'Color')}
+        </label>
+        <div className="space-y-1.5">
+          {colorOptions.map((c) => {
+            const isActive = filters.color === c.value;
+            return (
+              <button
+                key={c.value}
+                type="button"
+                onClick={() => onFilterChange('color', c.value)}
+                className={`w-full text-start flex items-center gap-2.5 px-4 py-2 rounded-full text-xs font-medium border-2 transition-all cursor-pointer ${
+                  isActive
+                    ? 'bg-[#C2784A] text-white border-[#C2784A] font-semibold shadow-xs'
+                    : 'bg-white text-[#6B5D51] border-[#F0E8DF] hover:border-[#D4956A] hover:text-[#A85D32] hover:bg-[#FDFAF6]'
+                }`}
+              >
+                {c.hex && (
+                  <span
+                    className="w-4 h-4 rounded-full border border-black/10 shadow-xs shrink-0"
+                    style={{ backgroundColor: c.hex }}
+                  />
+                )}
+                <span>{c.label}</span>
+              </button>
+            );
+          })}
+        </div>
+      </div>
+
+      {/* Type Filter */}
+      <div>
+        <label className="text-[11px] font-bold uppercase tracking-wider text-[#A89885] block mb-2">
+          {t('tiles.type', 'Type')}
+        </label>
+        <div className="space-y-1.5">
+          {typeOptions.map((tKey) => {
+            const isActive = filters.type === tKey;
+            const label =
+              tKey === 'all'
+                ? t('tiles.allTypes', 'All Types')
+                : t(`tiles.types.${tKey}`, tKey.charAt(0).toUpperCase() + tKey.slice(1));
+            return (
+              <button
+                key={tKey}
+                type="button"
+                onClick={() => onFilterChange('type', tKey)}
+                className={`w-full text-start px-4 py-2 rounded-full text-xs font-medium border-2 transition-all cursor-pointer ${
+                  isActive
+                    ? 'bg-[#C2784A] text-white border-[#C2784A] font-semibold shadow-xs'
+                    : 'bg-white text-[#6B5D51] border-[#F0E8DF] hover:border-[#D4956A] hover:text-[#A85D32] hover:bg-[#FDFAF6]'
+                }`}
+              >
+                {label}
+              </button>
+            );
+          })}
+        </div>
+      </div>
+
+      {/* Brand Filter */}
+      <div className={isGrid ? 'sm:col-span-2 md:col-span-3' : ''}>
+        <label className="text-[11px] font-bold uppercase tracking-wider text-[#A89885] block mb-2">
+          {t('tiles.brand', 'Brand')}
+        </label>
+        <div className={isGrid ? 'flex flex-wrap gap-2' : 'space-y-1.5'}>
+          {brandOptions.map((b) => {
+            const isActive = filters.brand === b;
+            const label =
+              b === 'all'
+                ? t('tiles.allBrands', 'All Brands')
+                : b
+                    .split(' ')
+                    .map((w) => w.charAt(0).toUpperCase() + w.slice(1))
+                    .join(' ');
+            return (
+              <button
+                key={b}
+                type="button"
+                onClick={() => onFilterChange('brand', b)}
+                className={`${
+                  isGrid ? 'px-4 py-2 text-xs font-medium rounded-full' : 'w-full text-start px-4 py-2 rounded-full text-xs font-medium'
+                } border-2 transition-all cursor-pointer ${
+                  isActive
+                    ? 'bg-[#C2784A] text-white border-[#C2784A] font-semibold shadow-xs'
+                    : 'bg-white text-[#6B5D51] border-[#F0E8DF] hover:border-[#D4956A] hover:text-[#A85D32] hover:bg-[#FDFAF6]'
+                }`}
+              >
+                {label}
+              </button>
+            );
+          })}
+        </div>
+      </div>
+
+      {/* Reset Filters (shown in Desktop sidebar) */}
+      {showResetButton && !isGrid && (
+        <button
+          type="button"
+          onClick={onReset}
+          className="w-full flex items-center justify-center gap-2 px-4 py-2.5 rounded-full border-2 border-[#E8DDD4] bg-[#FAF7F4] text-[#6B5D51] hover:bg-[#E8D5C4] hover:text-[#A85D32] hover:border-[#D4956A] font-semibold text-xs transition-all cursor-pointer"
+        >
+          <i className="fa-solid fa-rotate-left"></i> {t('tiles.resetFilters', 'Reset Filters')}
+        </button>
+      )}
+    </div>
+  );
+}
+
 export default function Tiles({ tiles = tilesData, onSelectTile }) {
   const { t } = useTranslation();
-  const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
+
+  // Mobile/Tablet expandable section state (hidden by default on screens < 1024px)
+  const [mobileFiltersOpen, setMobileFiltersOpen] = useState(false);
+
+  // Desktop sidebar visibility state (visible by default on PC screens >= 1024px)
+  const [desktopSidebarOpen, setDesktopSidebarOpen] = useState(true);
+
   const [filters, setFilters] = useState({
     size: 'all',
     color: 'all',
@@ -26,6 +222,28 @@ export default function Tiles({ tiles = tilesData, onSelectTile }) {
       name: '',
     });
   };
+
+  // Toggle handler:
+  // On screens < 1024px (mobile & tablet), moves the inline filter section down/up.
+  // On screens >= 1024px (PC screen), collapses/expands the left sidebar.
+  const handleToggleFilters = () => {
+    if (window.innerWidth < 1024) {
+      setMobileFiltersOpen((prev) => !prev);
+    } else {
+      setDesktopSidebarOpen((prev) => !prev);
+    }
+  };
+
+  // Count active filters (excluding 'all' and empty search)
+  const activeFilterCount = useMemo(() => {
+    let count = 0;
+    if (filters.size !== 'all') count++;
+    if (filters.color !== 'all') count++;
+    if (filters.type !== 'all') count++;
+    if (filters.brand !== 'all') count++;
+    if (filters.name && filters.name.trim() !== '') count++;
+    return count;
+  }, [filters]);
 
   const filteredTiles = useMemo(() => {
     return (tiles || tilesData).filter((tile) => {
@@ -59,193 +277,283 @@ export default function Tiles({ tiles = tilesData, onSelectTile }) {
   const typeOptions = ['all', 'porcelain', 'ceramic', 'marble', 'terrazzo'];
   const brandOptions = [
     'all',
-    'terra tile co.',
+    'Media Ceramic co.',
     'marazzi',
     'florim',
     'casalgrande',
   ];
 
   return (
-    <section className="animate-fade-slide-in flex-1 max-w-[1400px] mx-auto px-4 sm:px-8 py-8 sm:py-12">
+    <section className="animate-fade-slide-in flex-1 w-full max-w-[1400px] mx-auto px-4 sm:px-8 py-8 sm:py-12">
       {/* HEADER */}
       <div className="text-center mb-6 sm:mb-8">
         <span className="text-xs font-bold uppercase tracking-widest text-[#C2784A] block mb-2">
           {t('tiles.badge', 'Our Collection')}
         </span>
-        <h2 className="font-serif text-3xl sm:text-5xl font-semibold text-[#3D3229] tracking-tight mb-4">
+        <h2 className="font-serif text-3xl sm:text-5xl font-semibold text-[#3D3229] tracking-tight mb-2">
           {t('tiles.title', 'Find your perfect tile.')}
         </h2>
-        <button
-          onClick={() => setSidebarCollapsed(!sidebarCollapsed)}
-          className="inline-flex items-center gap-2 px-5 py-2 bg-white border-2 border-[#F0E8DF] rounded-full font-semibold text-sm text-[#3D3229] hover:border-[#D4956A] hover:bg-[#FDFAF6] hover:text-[#A85D32] transition-all cursor-pointer shadow-xs"
-        >
-          <i className="fa-solid fa-sliders text-sm"></i> Toggle Filters
-        </button>
+        <p className="text-xs sm:text-sm pt-4 text-[#8C7D6F] mb-5">
+          {t('tiles.showingResults', {
+            count: filteredTiles.length,
+            defaultValue: `Showing ${filteredTiles.length} tiles`,
+          })}
+        </p>
+
+        {/* Toggle Filters Button */}
+        <div className="flex items-center justify-center gap-3">
+          <button
+            type="button"
+            onClick={handleToggleFilters}
+            aria-expanded={mobileFiltersOpen || desktopSidebarOpen}
+            className={`inline-flex items-center gap-2.5 px-5 py-2.5 rounded-full font-semibold text-sm transition-all cursor-pointer shadow-xs border-2 ${
+              activeFilterCount > 0 || mobileFiltersOpen
+                ? 'bg-[#FDFAF6] border-[#C2784A] text-[#A85D32] shadow-sm'
+                : 'bg-white border-[#F0E8DF] text-[#3D3229] hover:border-[#D4956A] hover:bg-[#FDFAF6] hover:text-[#A85D32]'
+            }`}
+          >
+            <i className="fa-solid fa-sliders text-sm"></i>
+            <span>{t('tiles.toggleFilters', 'Filters')}</span>
+            {activeFilterCount > 0 && (
+              <span className="w-5 h-5 rounded-full bg-[#C2784A] text-white text-[11px] font-bold flex items-center justify-center shrink-0">
+                {activeFilterCount}
+              </span>
+            )}
+            {/* Dynamic arrow indicating down or up motion for mobile/tablet */}
+            <i
+              className={`fa-solid ${
+                mobileFiltersOpen ? 'fa-chevron-up text-[#C2784A]' : 'fa-chevron-down text-[#A89885]'
+              } text-xs transition-transform duration-200 lg:hidden`}
+            ></i>
+          </button>
+        </div>
+
+        {/* Active Filter Quick-Chips Bar */}
+        {activeFilterCount > 0 && (
+          <div className="mt-4 flex flex-wrap items-center justify-center gap-2 max-w-2xl mx-auto">
+            <span className="text-xs font-medium text-[#A89885] me-1">
+              {t('tiles.activeFilters', 'Active Filters')}:
+            </span>
+
+            {filters.name && (
+              <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs bg-white border border-[#E8DDD4] text-[#6B5D51] shadow-xs">
+                <span>"{filters.name}"</span>
+                <button
+                  type="button"
+                  onClick={() => handleFilterChange('name', '')}
+                  className="hover:text-[#C2784A] cursor-pointer text-[10px]"
+                  title={t('tiles.clearSearch', 'Clear search')}
+                >
+                  <i className="fa-solid fa-xmark"></i>
+                </button>
+              </span>
+            )}
+
+            {filters.size !== 'all' && (
+              <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs bg-white border border-[#E8DDD4] text-[#6B5D51] shadow-xs">
+                <span>{filters.size.replace('x', '×')} cm</span>
+                <button
+                  type="button"
+                  onClick={() => handleFilterChange('size', 'all')}
+                  className="hover:text-[#C2784A] cursor-pointer text-[10px]"
+                >
+                  <i className="fa-solid fa-xmark"></i>
+                </button>
+              </span>
+            )}
+
+            {filters.color !== 'all' && (
+              <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs bg-white border border-[#E8DDD4] text-[#6B5D51] shadow-xs">
+                <span
+                  className="w-2.5 h-2.5 rounded-full border border-black/10 shrink-0"
+                  style={{
+                    backgroundColor:
+                      colorOptions.find((c) => c.value === filters.color)?.hex ||
+                      'transparent',
+                  }}
+                />
+                <span className="capitalize">{filters.color}</span>
+                <button
+                  type="button"
+                  onClick={() => handleFilterChange('color', 'all')}
+                  className="hover:text-[#C2784A] cursor-pointer text-[10px]"
+                >
+                  <i className="fa-solid fa-xmark"></i>
+                </button>
+              </span>
+            )}
+
+            {filters.type !== 'all' && (
+              <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs bg-white border border-[#E8DDD4] text-[#6B5D51] shadow-xs">
+                <span className="capitalize">{filters.type}</span>
+                <button
+                  type="button"
+                  onClick={() => handleFilterChange('type', 'all')}
+                  className="hover:text-[#C2784A] cursor-pointer text-[10px]"
+                >
+                  <i className="fa-solid fa-xmark"></i>
+                </button>
+              </span>
+            )}
+
+            {filters.brand !== 'all' && (
+              <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs bg-white border border-[#E8DDD4] text-[#6B5D51] shadow-xs">
+                <span className="capitalize">{filters.brand}</span>
+                <button
+                  type="button"
+                  onClick={() => handleFilterChange('brand', 'all')}
+                  className="hover:text-[#C2784A] cursor-pointer text-[10px]"
+                >
+                  <i className="fa-solid fa-xmark"></i>
+                </button>
+              </span>
+            )}
+
+            <button
+              type="button"
+              onClick={resetFilters}
+              className="text-xs font-semibold text-[#C2784A] hover:text-[#A85D32] underline cursor-pointer ms-1"
+            >
+              {t('tiles.clearAll', 'Clear all')}
+            </button>
+          </div>
+        )}
       </div>
 
-      {/* LAYOUT GRID */}
-      <div className="flex flex-col md:flex-row gap-6 sm:gap-8 items-start">
-        {/* SIDEBAR FILTERS */}
+      {/* MOBILE & TABLET EXPANDABLE FILTER SECTION (< 1024px) */}
+      {/* Expands DOWN when toggled open, pushing the content down; collapses UP when toggled closed */}
+      {mobileFiltersOpen && (
+        <div className="lg:hidden w-full bg-white rounded-2xl border border-[#F0E8DF] p-5 sm:p-6 shadow-sm mb-8 animate-filter-slide-down">
+          <div className="flex items-center justify-between pb-3 mb-5 border-b border-[#F0E8DF]">
+            <div className="flex items-center gap-2.5">
+              <span className="w-8 h-8 rounded-full bg-[#FAF7F4] border border-[#F0E8DF] flex items-center justify-center text-[#C2784A] text-sm">
+                <i className="fa-solid fa-sliders"></i>
+              </span>
+              <h3 className="font-serif text-lg font-semibold text-[#3D3229]">
+                {t('tiles.filtersTitle', 'Filters')}
+              </h3>
+              {activeFilterCount > 0 && (
+                <span className="px-2 py-0.5 rounded-full text-xs font-bold bg-[#C2784A] text-white">
+                  {activeFilterCount}
+                </span>
+              )}
+            </div>
+            {/* Close / Collapse Up button */}
+            <button
+              type="button"
+              onClick={() => setMobileFiltersOpen(false)}
+              aria-label={t('tiles.closeFilters', 'Close filters')}
+              className="w-8 h-8 rounded-full bg-[#FAF7F4] hover:bg-[#F0E8DF] text-[#6B5D51] hover:text-[#3D3229] flex items-center justify-center text-xs transition-colors cursor-pointer"
+            >
+              <i className="fa-solid fa-chevron-up"></i>
+            </button>
+          </div>
+
+          <FilterControls
+            filters={filters}
+            onFilterChange={handleFilterChange}
+            onReset={resetFilters}
+            sizeOptions={sizeOptions}
+            colorOptions={colorOptions}
+            typeOptions={typeOptions}
+            brandOptions={brandOptions}
+            t={t}
+            layout="grid"
+            showResetButton={false}
+          />
+
+          {/* Action Row */}
+          <div className="mt-6 pt-4 border-t border-[#F0E8DF] flex flex-wrap items-center justify-end gap-3">
+            {activeFilterCount > 0 && (
+              <button
+                type="button"
+                onClick={resetFilters}
+                className="px-4 py-2 rounded-full border-2 border-[#E8DDD4] bg-[#FAF7F4] hover:bg-[#E8D5C4] text-[#6B5D51] font-semibold text-xs transition-colors cursor-pointer"
+              >
+                <i className="fa-solid fa-rotate-left me-1"></i> {t('tiles.resetFilters', 'Reset')}
+              </button>
+            )}
+            <button
+              type="button"
+              onClick={() => setMobileFiltersOpen(false)}
+              className="px-6 py-2.5 rounded-full bg-[#C2784A] hover:bg-[#A85D32] text-white font-semibold text-xs transition-all cursor-pointer shadow-xs flex items-center gap-2"
+            >
+              <span>
+                {t('tiles.showResults', {
+                  count: filteredTiles.length,
+                  defaultValue: `Show ${filteredTiles.length} Tiles`,
+                })}
+              </span>
+              <i className="fa-solid fa-chevron-up text-[10px]"></i>
+            </button>
+          </div>
+        </div>
+      )}
+
+      {/* MAIN CONTENT AREA */}
+      {/* w-full ensures that whether 0 or 100 tiles match, the sidebar stays fixed on the left and NEVER shifts to the center */}
+      <div className="w-full flex flex-col lg:flex-row gap-6 sm:gap-8 items-start">
+        {/* DESKTOP SIDEBAR FILTERS (Fixed on the left on PC screen >= 1024px; never appears on mobile/tablet) */}
         <aside
-          className={`w-full md:w-64 bg-white rounded-2xl border border-[#F0E8DF] p-5 shadow-xs transition-all duration-300 ${
-            sidebarCollapsed
-              ? 'hidden md:hidden'
-              : 'block md:sticky md:top-20 md:max-h-[calc(100vh-100px)] md:overflow-y-auto'
+          className={`hidden transition-all duration-300 ${
+            desktopSidebarOpen
+              ? 'lg:block lg:w-68 xl:w-72 bg-white rounded-2xl border border-[#F0E8DF] p-5 shadow-xs lg:sticky lg:top-20 lg:max-h-[calc(100vh-100px)] lg:overflow-y-auto shrink-0'
+              : 'lg:hidden'
           }`}
         >
-          {/* Search Filter */}
-          <div className="mb-6">
-            <label className="text-[11px] font-bold uppercase tracking-wider text-[#A89885] block mb-2">
-              {t('tiles.search', 'Search')}
-            </label>
-            <input
-              type="text"
-              placeholder={t('tiles.searchPlaceholder', 'Search by name...')}
-              value={filters.name}
-              onChange={(e) => handleFilterChange('name', e.target.value)}
-              className="w-full px-4 py-2.5 border-2 border-[#F0E8DF] rounded-full text-sm bg-[#FAF7F4] focus:outline-none focus:border-[#D4956A] text-[#3D3229] transition-all"
-            />
+          <div className="flex items-center justify-between pb-3 mb-4 border-b border-[#F0E8DF]">
+            <h3 className="font-serif text-lg font-semibold text-[#3D3229] flex items-center gap-2">
+              <i className="fa-solid fa-sliders text-[#C2784A] text-sm"></i>
+              <span>{t('tiles.filtersTitle', 'Filters')}</span>
+            </h3>
+            {activeFilterCount > 0 && (
+              <span className="px-2 py-0.5 rounded-full text-[11px] font-bold bg-[#FAF7F4] text-[#C2784A] border border-[#F0E8DF]">
+                {activeFilterCount}
+              </span>
+            )}
           </div>
 
-          {/* Size Filter */}
-          <div className="mb-6">
-            <label className="text-[11px] font-bold uppercase tracking-wider text-[#A89885] block mb-2">
-              {t('tiles.size', 'Size')}
-            </label>
-            <div className="space-y-1.5">
-              {sizeOptions.map((sz) => {
-                const isActive = filters.size === sz;
-                const label = sz === 'all' ? t('tiles.allSizes', 'All Sizes') : `${sz.replace('x', '×')} cm`;
-                return (
-                  <button
-                    key={sz}
-                    onClick={() => handleFilterChange('size', sz)}
-                    className={`w-full text-left px-4 py-2 rounded-full text-xs font-medium border-2 transition-all cursor-pointer ${
-                      isActive
-                        ? 'bg-[#C2784A] text-white border-[#C2784A] font-semibold'
-                        : 'bg-white text-[#6B5D51] border-[#F0E8DF] hover:border-[#D4956A] hover:text-[#A85D32] hover:bg-[#FDFAF6]'
-                    }`}
-                  >
-                    {label}
-                  </button>
-                );
-              })}
-            </div>
-          </div>
-
-          {/* Color Filter */}
-          <div className="mb-6">
-            <label className="text-[11px] font-bold uppercase tracking-wider text-[#A89885] block mb-2">
-              {t('tiles.color', 'Color')}
-            </label>
-            <div className="space-y-1.5">
-              {colorOptions.map((c) => {
-                const isActive = filters.color === c.value;
-                return (
-                  <button
-                    key={c.value}
-                    onClick={() => handleFilterChange('color', c.value)}
-                    className={`w-full text-left flex items-center gap-2 px-4 py-2 rounded-full text-xs font-medium border-2 transition-all cursor-pointer ${
-                      isActive
-                        ? 'bg-[#C2784A] text-white border-[#C2784A] font-semibold'
-                        : 'bg-white text-[#6B5D51] border-[#F0E8DF] hover:border-[#D4956A] hover:text-[#A85D32] hover:bg-[#FDFAF6]'
-                    }`}
-                  >
-                    {c.hex && (
-                      <span
-                        className="w-4 h-4 rounded-full border border-white/50 shadow-xs shrink-0"
-                        style={{ backgroundColor: c.hex }}
-                      />
-                    )}
-                    {c.label}
-                  </button>
-                );
-              })}
-            </div>
-          </div>
-
-          {/* Type Filter */}
-          <div className="mb-6">
-            <label className="text-[11px] font-bold uppercase tracking-wider text-[#A89885] block mb-2">
-              {t('tiles.type', 'Type')}
-            </label>
-            <div className="space-y-1.5">
-              {typeOptions.map((tKey) => {
-                const isActive = filters.type === tKey;
-                const label =
-                  tKey === 'all'
-                    ? t('tiles.allTypes', 'All Types')
-                    : t(`tiles.types.${tKey}`, tKey.charAt(0).toUpperCase() + tKey.slice(1));
-                return (
-                  <button
-                    key={tKey}
-                    onClick={() => handleFilterChange('type', tKey)}
-                    className={`w-full text-left px-4 py-2 rounded-full text-xs font-medium border-2 transition-all cursor-pointer ${
-                      isActive
-                        ? 'bg-[#C2784A] text-white border-[#C2784A] font-semibold'
-                        : 'bg-white text-[#6B5D51] border-[#F0E8DF] hover:border-[#D4956A] hover:text-[#A85D32] hover:bg-[#FDFAF6]'
-                    }`}
-                  >
-                    {label}
-                  </button>
-                );
-              })}
-            </div>
-          </div>
-
-          {/* Brand Filter */}
-          <div className="mb-6">
-            <label className="text-[11px] font-bold uppercase tracking-wider text-[#A89885] block mb-2">
-              {t('tiles.brand', 'Brand')}
-            </label>
-            <div className="space-y-1.5">
-              {brandOptions.map((b) => {
-                const isActive = filters.brand === b;
-                const label =
-                  b === 'all'
-                    ? t('tiles.allBrands', 'All Brands')
-                    : b
-                        .split(' ')
-                        .map((w) => w.charAt(0).toUpperCase() + w.slice(1))
-                        .join(' ');
-                return (
-                  <button
-                    key={b}
-                    onClick={() => handleFilterChange('brand', b)}
-                    className={`w-full text-left px-4 py-2 rounded-full text-xs font-medium border-2 transition-all cursor-pointer ${
-                      isActive
-                        ? 'bg-[#C2784A] text-white border-[#C2784A] font-semibold'
-                        : 'bg-white text-[#6B5D51] border-[#F0E8DF] hover:border-[#D4956A] hover:text-[#A85D32] hover:bg-[#FDFAF6]'
-                    }`}
-                  >
-                    {label}
-                  </button>
-                );
-              })}
-            </div>
-          </div>
-
-          {/* Reset Filters */}
-          <button
-            onClick={resetFilters}
-            className="w-full flex items-center justify-center gap-2 px-4 py-2.5 rounded-full border-2 border-[#E8DDD4] bg-[#FAF7F4] text-[#6B5D51] hover:bg-[#E8D5C4] hover:text-[#A85D32] hover:border-[#D4956A] font-semibold text-xs transition-all cursor-pointer"
-          >
-            <i className="fa-solid fa-rotate-left"></i> {t('tiles.resetFilters', 'Reset Filters')}
-          </button>
+          <FilterControls
+            filters={filters}
+            onFilterChange={handleFilterChange}
+            onReset={resetFilters}
+            sizeOptions={sizeOptions}
+            colorOptions={colorOptions}
+            typeOptions={typeOptions}
+            brandOptions={brandOptions}
+            t={t}
+            layout="vertical"
+            showResetButton={true}
+          />
         </aside>
 
         {/* MAIN TILES GRID */}
         <main className="flex-1 w-full min-w-0">
           {filteredTiles.length === 0 ? (
-            <div className="text-center py-16 px-4 text-[#A89885]">
+            <div className="w-full text-center py-20 px-4 text-[#A89885] bg-white rounded-2xl border border-[#F0E8DF] p-8">
               <i className="fa-solid fa-magnifying-glass text-4xl mb-4 text-[#E8DDD4] block"></i>
-              <p className="text-base">
-                {t('tiles.noMatchTitle', 'No tiles match your filters.')}<br />
+              <p className="text-base font-medium text-[#3D3229] mb-2">
+                {t('tiles.noMatchTitle', 'No tiles match your filters.')}
+              </p>
+              <p className="text-sm text-[#A89885] mb-6">
                 {t('tiles.noMatchSubtitle', 'Try adjusting your criteria.')}
               </p>
+              <button
+                type="button"
+                onClick={resetFilters}
+                className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full bg-[#C2784A] text-white font-semibold text-xs hover:bg-[#A85D32] transition-colors cursor-pointer shadow-xs"
+              >
+                <i className="fa-solid fa-rotate-left"></i> {t('tiles.resetFilters', 'Reset Filters')}
+              </button>
             </div>
           ) : (
-            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 pb-16">
+            <div
+              className={`grid gap-6 pb-16 ${
+                desktopSidebarOpen
+                  ? 'grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4'
+                  : 'grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5'
+              }`}
+            >
               {filteredTiles.map((tile) => (
                 <div
                   key={tile.id}
@@ -256,7 +564,7 @@ export default function Tiles({ tiles = tilesData, onSelectTile }) {
                   {/* Badge */}
                   {tile.badge && (
                     <span
-                      className={`absolute top-3 left-3 z-10 px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider shadow-sm text-white ${
+                      className={`absolute top-3 start-3 z-10 px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider shadow-sm text-white ${
                         tile.badge === 'new'
                           ? 'bg-[#2E7D32]'
                           : tile.badge === 'featured'
@@ -268,7 +576,7 @@ export default function Tiles({ tiles = tilesData, onSelectTile }) {
                     </span>
                   )}
 
-                  {/* Tile Swatch Image Box - displays tile image from backend/data */}
+                  {/* Tile Swatch Image Box */}
                   <div className="aspect-square relative overflow-hidden bg-[#FAF7F4] flex items-center justify-center">
                     <img
                       src={tile.image || `https://picsum.photos/seed/${tile.id}-tile/600/600`}
@@ -280,7 +588,7 @@ export default function Tiles({ tiles = tilesData, onSelectTile }) {
 
                   {/* Card Body */}
                   <div className="p-4">
-                    <h3 className="font-serif text-lg font-semibold text-[#3D3229] mb-2 group-hover:text-[#C2784A] transition-colors">
+                    <h3 className="font-serif text-lg font-semibold text-[#3D3229] mb-2 group-hover:text-[#C2784A] transition-colors line-clamp-1">
                       {tile.name}
                     </h3>
                     <div className="flex flex-wrap gap-1.5 text-xs text-[#A89885]">

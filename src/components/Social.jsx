@@ -26,7 +26,7 @@ const formatDestinationUrl = (url) => {
     return `https:${trimmed}`;
   }
 
-  // Prepend https:// for domain inputs like 'instagram.com', 'pinterest.com/terra'
+  // Prepend https:// for domain inputs like 'instagram.com', 'pinterest.com/Media Ceramic'
   return `https://${trimmed}`;
 };
 
@@ -49,7 +49,7 @@ export default function Social({ socialLinks = initialSocialLinks, onNavigate })
 
         {/* Title & Bio */}
         <h2 className="font-serif text-2xl sm:text-3xl font-semibold text-[#3D3229] mb-1">
-          {t('social.title', 'TERRA TILE CO.')}
+          {t('social.title', 'Media Ceramic TILE CO.')}
         </h2>
         <p className="text-[#C2784A] font-semibold text-sm mb-3">{t('social.handle', '@terratile.co')}</p>
         <p className="text-[#6B5D51] text-sm leading-relaxed mb-8">

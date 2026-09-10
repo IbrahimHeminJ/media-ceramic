@@ -81,7 +81,7 @@ export default function Home({ onNavigate }) {
               {t('story.title', 'Rooted in craftsmanship, designed for modern living.')}
             </h2>
             <p className="text-[#6B5D51] text-base leading-relaxed">
-              {t('story.paragraph', "TERRA TILE CO. was born from a deep appreciation for natural materials and timeless design. We source the finest clays, stones, and minerals to create tiles that don't just cover surfaces — they transform them. Every piece is a marriage of tradition and innovation, crafted to bring warmth underfoot and beauty to every wall.")}
+              {t('story.paragraph', "Media Ceramic CO. was born from a deep appreciation for natural materials and timeless design. We source the finest clays, stones, and minerals to create tiles that don't just cover surfaces — they transform them. Every piece is a marriage of tradition and innovation, crafted to bring warmth underfoot and beauty to every wall.")}
             </p>
           </div>
         </div>
@@ -185,8 +185,8 @@ export default function Home({ onNavigate }) {
                   </span>
                 </div>
                 <p className="text-sm text-[#6B5D51] mt-0.5">
-                  {t('contact.addressLine1', '127 Warm Street, Design District')}<br />
-                  {t('contact.addressLine2', 'Portland, OR 97201')}
+                  {t('contact.addressLine1', 'Shorsh Road')}<br />
+                  {t('contact.addressLine2', 'Erbil, Iraq')}
                 </p>
               </div>
             </button>
@@ -277,12 +277,12 @@ export default function Home({ onNavigate }) {
                   <div className="flex items-center gap-2 text-[#3D3229] font-medium">
                     <i className="fa-solid fa-location-dot text-[#C2784A]"></i>
                     <span className="truncate max-w-[180px] sm:max-w-none">
-                      {t('contact.showroomLocation', 'Portland Showroom, OR 97201')}
+                      {t('contact.showroomLocation', 'Media Ceramic Showroom, Erbil, Iraq')}
                     </span>
                   </div>
                   <div className="flex items-center gap-2">
                     <a
-                      href="https://maps.google.com/?q=127+Warm+Street+Portland+OR+97201"
+                      href="https://maps.app.goo.gl/5RAKuzAfddenHUzt5"
                       target="_blank"
                       rel="noopener noreferrer"
                       className="inline-flex items-center gap-1.5 px-3 py-1 bg-[#FAF7F4] hover:bg-[#E8D5C4] text-[#A85D32] font-semibold rounded-lg border border-[#F0E8DF] transition-colors"
@@ -306,8 +306,8 @@ export default function Home({ onNavigate }) {
                 {/* Map iframe */}
                 <div className="relative flex-1 w-full min-h-[280px]">
                   <iframe
-                    title="TERRA TILE CO. Showroom Location"
-                    src="https://maps.google.com/maps?q=127+Warm+Street+Portland+OR+97201&t=&z=14&ie=UTF8&iwloc=&output=embed"
+                    title="Media Ceramic CO. Showroom Location"
+                    src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d25755.116709731185!2d44.00575012105333!3d36.20572450743198!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x400723005a10bd13%3A0x23db536ac0348cc1!2sMedia%20Ceramic!5e0!3m2!1sen!2siq!4v1789036457251!5m2!1sen!2siq"
                     className="w-full h-full border-0 absolute inset-0"
                     loading="lazy"
                     allowFullScreen

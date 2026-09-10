@@ -9,7 +9,7 @@ export default function Footer() {
     <>
       <footer className="text-center p-6 sm:p-8 text-[#A89885] text-xs sm:text-sm bg-[#FDFAF6]">
         <FooterHasarasoft />
-        <p>{t('footer.copyright', '© 2026 TERRA TILE CO. — Warm floors, beautiful walls. All rights reserved.')}</p>
+        <p>{t('footer.copyright', '© 2026 Media Ceramic CO. — Warm floors, beautiful walls. All rights reserved.')}</p>
       </footer>
     </>
   );

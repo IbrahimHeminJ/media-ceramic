@@ -12,9 +12,9 @@ const resources = {
 };
 
 export const SUPPORTED_LANGUAGES = [
-  { code: 'en', label: 'English', nativeName: 'English', dir: 'ltr', flag: '🇬🇧' },
-  { code: 'ku', label: 'Kurdish', nativeName: 'کوردی', dir: 'rtl', flag: '☀️' },
-  { code: 'ar', label: 'Arabic', nativeName: 'العربية', dir: 'rtl', flag: '🇸🇦' },
+  { code: 'en', label: 'English', nativeName: 'English', dir: 'ltr', flag: 'EN' },
+  { code: 'ku', label: 'Kurdish', nativeName: 'کوردی', dir: 'rtl', flag: 'کو' },
+  { code: 'ar', label: 'Arabic', nativeName: 'العربية', dir: 'rtl', flag: 'ع' },
 ];
 
 const RTL_LANGUAGES = ['ar', 'ku'];
