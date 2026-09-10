@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import { resolveAssetUrl } from '../api/client';
 
 /**
  * TileModal Component
@@ -52,21 +53,17 @@ export default function TileModal({ tile, onClose }) {
     t('modal.mockups.closeUpDetail', 'Close-up Detail'),
   ];
 
-  // Main tile image source (ready for future backend property integration)
+  // Main tile image source
   const mainImageSrc =
-    tile.image || `https://picsum.photos/seed/${tile.id}-tile/800/800`;
+    resolveAssetUrl(tile.imagePath) || `https://picsum.photos/seed/${tile.id}-tile/800/800`;
 
   // Up to 4 orientations maximum
   const orientationsList = Array.isArray(tile.orientations)
     ? tile.orientations.slice(0, 4)
     : [];
 
-  // Mockups list (supports tile.mockups objects array or legacy mockupSeeds array)
-  const mockupsList = Array.isArray(tile.mockups)
-    ? tile.mockups
-    : Array.isArray(tile.mockupSeeds)
-    ? tile.mockupSeeds
-    : [];
+  // Mockups list
+  const mockupsList = Array.isArray(tile.mockups) ? tile.mockups : [];
 
   return (
     <>
@@ -145,28 +142,28 @@ export default function TileModal({ tile, onClose }) {
               <span className="bg-[#F5EDE4] px-3.5 py-1.5 rounded-full text-xs font-medium text-[#3D3229] flex items-center gap-1.5 capitalize">
                 <i className="fa-solid fa-palette text-[#C2784A]"></i> {tile.color}
               </span>
-              {tile.specs?.thickness && (
+              {tile.thickness && (
                 <span className="bg-[#F5EDE4] px-3.5 py-1.5 rounded-full text-xs font-medium text-[#3D3229] flex items-center gap-1.5">
                   <i className="fa-solid fa-layer-group text-[#C2784A]"></i>{' '}
-                  {tile.specs.thickness}
+                  {tile.thickness}
                 </span>
               )}
-              {tile.specs?.finish && (
+              {tile.finish && (
                 <span className="bg-[#F5EDE4] px-3.5 py-1.5 rounded-full text-xs font-medium text-[#3D3229] flex items-center gap-1.5">
                   <i className="fa-solid fa-spray-can-sparkles text-[#C2784A]"></i>{' '}
-                  {tile.specs.finish}
+                  {tile.finish}
                 </span>
               )}
-              {tile.specs?.slipResistance && (
+              {tile.slipResistance && (
                 <span className="bg-[#F5EDE4] px-3.5 py-1.5 rounded-full text-xs font-medium text-[#3D3229] flex items-center gap-1.5">
                   <i className="fa-solid fa-grip text-[#C2784A]"></i>{' '}
-                  {tile.specs.slipResistance}
+                  {tile.slipResistance}
                 </span>
               )}
-              {tile.specs?.usage && (
+              {tile.usage && (
                 <span className="bg-[#F5EDE4] px-3.5 py-1.5 rounded-full text-xs font-medium text-[#3D3229] flex items-center gap-1.5">
                   <i className="fa-solid fa-check-circle text-[#C2784A]"></i>{' '}
-                  {tile.specs.usage}
+                  {tile.usage}
                 </span>
               )}
             </div>
@@ -176,11 +173,11 @@ export default function TileModal({ tile, onClose }) {
               {tile.description}
             </p>
 
-            {/* CONDITIONAL PDF DOWNLOAD BUTTON (Shown only when tile has a pdfUrl) */}
-            {tile.pdfUrl && (
+            {/* CONDITIONAL PDF DOWNLOAD BUTTON (Shown only when tile has a pdfPath) */}
+            {tile.pdfPath && (
               <div className="mb-8">
                 <a
-                  href={tile.pdfUrl}
+                  href={resolveAssetUrl(tile.pdfPath)}
                   target="_blank"
                   rel="noopener noreferrer"
                   download
@@ -201,12 +198,8 @@ export default function TileModal({ tile, onClose }) {
                 </h4>
                 <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-4">
                   {orientationsList.map((pattern, idx) => {
-                    const name =
-                      typeof pattern === 'object'
-                        ? pattern.name
-                        : `Pattern ${idx + 1}`;
-                    const imgSrc =
-                      typeof pattern === 'object' ? pattern.image : pattern;
+                    const name = pattern.name || `Pattern ${idx + 1}`;
+                    const imgSrc = resolveAssetUrl(pattern.imagePath);
 
                     return (
                       <div key={idx} className="text-center group">
@@ -246,21 +239,8 @@ export default function TileModal({ tile, onClose }) {
               {mockupsList.length > 0 ? (
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
                   {mockupsList.map((mockup, i) => {
-                    const imgSrc =
-                      typeof mockup === 'object'
-                        ? mockup.image
-                        : typeof mockup === 'string' &&
-                          (mockup.startsWith('http://') ||
-                            mockup.startsWith('https://') ||
-                            mockup.startsWith('data:'))
-                        ? mockup
-                        : `https://picsum.photos/seed/${mockup}/800/600`;
-                    const label =
-                      (typeof mockup === 'object'
-                        ? mockup.label || mockup.name
-                        : null) ||
-                      mockupLabels[i] ||
-                      `Mockup ${i + 1}`;
+                    const imgSrc = resolveAssetUrl(mockup.imagePath);
+                    const label = mockup.label || mockupLabels[i] || `Mockup ${i + 1}`;
 
                     return (
                       <div

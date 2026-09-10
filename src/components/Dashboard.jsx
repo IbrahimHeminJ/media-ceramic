@@ -1,4 +1,5 @@
 import React, { useState, useMemo } from 'react';
+import { resolveAssetUrl } from '../api/client';
 
 /**
  * Predefined Icons catalog for Social Links management.
@@ -159,12 +160,12 @@ export default function Dashboard({
         escapeCsv(tile.color),
         escapeCsv(tile.type),
         escapeCsv(tile.badge || 'None'),
-        escapeCsv(tile.specs?.thickness || ''),
-        escapeCsv(tile.specs?.finish || ''),
-        escapeCsv(tile.specs?.slipResistance || ''),
-        escapeCsv(tile.specs?.usage || ''),
-        escapeCsv(tile.pdfUrl || 'N/A'),
-        escapeCsv(tile.image || ''),
+        escapeCsv(tile.thickness || ''),
+        escapeCsv(tile.finish || ''),
+        escapeCsv(tile.slipResistance || ''),
+        escapeCsv(tile.usage || ''),
+        escapeCsv(tile.pdfPath ? resolveAssetUrl(tile.pdfPath) : 'N/A'),
+        escapeCsv(tile.imagePath ? resolveAssetUrl(tile.imagePath) : ''),
         escapeCsv(orientationsCount),
         escapeCsv(orientationsList),
         escapeCsv(tile.description || ''),
@@ -190,20 +191,28 @@ export default function Dashboard({
   // =========================================================================
   // 4. DELETE HANDLERS
   // =========================================================================
-  const confirmDeleteTile = () => {
+  const confirmDeleteTile = async () => {
     if (!tileToDelete) return;
     const tileName = tileToDelete.name;
-    onDeleteTile(tileToDelete.id);
-    setTileToDelete(null);
-    showToast(`Tile "${tileName}" was permanently removed.`);
+    try {
+      await onDeleteTile(tileToDelete.id);
+      setTileToDelete(null);
+      showToast(`Tile "${tileName}" was permanently removed.`);
+    } catch (err) {
+      showToast(`Failed to delete "${tileName}". Please try again.`);
+    }
   };
 
-  const confirmDeleteSocialLink = () => {
+  const confirmDeleteSocialLink = async () => {
     if (!socialToDelete) return;
     const linkName = socialToDelete.name;
-    onDeleteSocialLink(socialToDelete.id);
-    setSocialToDelete(null);
-    showToast(`Social link "${linkName}" was removed.`);
+    try {
+      await onDeleteSocialLink(socialToDelete.id);
+      setSocialToDelete(null);
+      showToast(`Social link "${linkName}" was removed.`);
+    } catch (err) {
+      showToast(`Failed to delete "${linkName}". Please try again.`);
+    }
   };
 
   return (
@@ -477,7 +486,7 @@ export default function Dashboard({
                             <div className="w-12 h-12 rounded-xl overflow-hidden bg-[#FAF7F4] border border-[#F0E8DF] shrink-0 shadow-2xs">
                               <img
                                 src={
-                                  tile.image ||
+                                  resolveAssetUrl(tile.imagePath) ||
                                   `https://picsum.photos/seed/${tile.id}-tile/200/200`
                                 }
                                 alt={tile.name}
@@ -525,25 +534,25 @@ export default function Dashboard({
                             {tile.size} cm
                           </div>
                           <span className="text-xs text-[#A89885]">
-                            {tile.specs?.thickness || 'Standard'}
+                            {tile.thickness || 'Standard'}
                           </span>
                         </td>
 
                         {/* Finish & Slip */}
                         <td className="py-3 px-4">
                           <div className="text-[#3D3229]">
-                            {tile.specs?.finish || 'Matte'}
+                            {tile.finish || 'Matte'}
                           </div>
                           <span className="text-xs text-[#A89885]">
-                            {tile.specs?.slipResistance || 'R10'}
+                            {tile.slipResistance || 'R10'}
                           </span>
                         </td>
 
                         {/* Spec PDF Status */}
                         <td className="py-3 px-4">
-                          {tile.pdfUrl ? (
+                          {tile.pdfPath ? (
                             <a
-                              href={tile.pdfUrl}
+                              href={resolveAssetUrl(tile.pdfPath)}
                               target="_blank"
                               rel="noopener noreferrer"
                               className="inline-flex items-center gap-1 text-xs text-[#C2784A] hover:underline font-medium"
@@ -603,10 +612,16 @@ export default function Dashboard({
         {activeTab === 'add' && (
           <div className="p-6 sm:p-10">
             <TileForm
-              onSubmit={(newTileData) => {
-                onAddTile(newTileData);
-                showToast(`New tile "${newTileData.name}" was added successfully!`);
-                setActiveTab('list');
+              mode="create"
+              onSubmit={async (formData, tileName) => {
+                try {
+                  await onAddTile(formData);
+                  showToast(`New tile "${tileName}" was added successfully!`);
+                  setActiveTab('list');
+                } catch (err) {
+                  showToast('Failed to add tile. Please check the form and try again.');
+                  throw err;
+                }
               }}
               onCancel={() => setActiveTab('list')}
             />
@@ -620,8 +635,8 @@ export default function Dashboard({
           <div className="p-6 sm:p-10">
             <SocialLinksManager
               socialLinks={socialLinks}
-              onAddLink={(newLink) => {
-                onAddSocialLink(newLink);
+              onAddLink={async (newLink) => {
+                await onAddSocialLink(newLink);
                 showToast(`Social link "${newLink.name}" added successfully!`);
               }}
               onDeleteLink={(link) => setSocialToDelete(link)}
@@ -636,10 +651,15 @@ export default function Dashboard({
       {editingTile && (
         <EditTileModal
           tile={editingTile}
-          onSave={(updatedTile) => {
-            onUpdateTile(updatedTile);
-            setEditingTile(null);
-            showToast(`Tile "${updatedTile.name}" updated successfully!`);
+          onSave={async (formData) => {
+            try {
+              const updated = await onUpdateTile(editingTile.id, formData);
+              setEditingTile(null);
+              showToast(`Tile "${updated.name}" updated successfully!`);
+            } catch (err) {
+              showToast('Failed to update tile. Please try again.');
+              throw err;
+            }
           }}
           onClose={() => setEditingTile(null)}
         />
@@ -755,6 +775,7 @@ function SocialLinksManager({ socialLinks = [], onAddLink, onDeleteLink }) {
   const [name, setName] = useState('');
   const [href, setHref] = useState('');
   const [error, setError] = useState('');
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const activeIconClass = customIconClass.trim() || selectedIcon.icon;
   const activeIconColor = selectedIcon.color || 'text-[#C2784A]';
@@ -781,7 +802,7 @@ function SocialLinksManager({ socialLinks = [], onAddLink, onDeleteLink }) {
     return `https://${trimmed}`;
   };
 
-  const handleCreateSubmit = (e) => {
+  const handleCreateSubmit = async (e) => {
     e.preventDefault();
     setError('');
 
@@ -798,19 +819,23 @@ function SocialLinksManager({ socialLinks = [], onAddLink, onDeleteLink }) {
     const normalizedHref = formatDestinationUrl(href);
 
     const newLink = {
-      id: String(Date.now()),
       name: name.trim(),
       href: normalizedHref,
       icon: activeIconClass,
       color: activeIconColor,
     };
 
-    onAddLink(newLink);
-
-    // Reset input fields
-    setName('');
-    setHref('');
-    setCustomIconClass('');
+    setIsSubmitting(true);
+    try {
+      await onAddLink(newLink);
+      setName('');
+      setHref('');
+      setCustomIconClass('');
+    } catch (err) {
+      setError('Failed to create social link. Please try again.');
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
@@ -928,10 +953,20 @@ function SocialLinksManager({ socialLinks = [], onAddLink, onDeleteLink }) {
 
             <button
               type="submit"
-              className="inline-flex items-center justify-center gap-2 px-8 py-3 bg-[#C2784A] hover:bg-[#A85D32] text-white rounded-full text-sm font-semibold transition-all shadow-md hover:shadow-lg cursor-pointer shrink-0"
+              disabled={isSubmitting}
+              className="inline-flex items-center justify-center gap-2 px-8 py-3 bg-[#C2784A] hover:bg-[#A85D32] text-white rounded-full text-sm font-semibold transition-all shadow-md hover:shadow-lg cursor-pointer shrink-0 disabled:opacity-70"
             >
-              <i className="fa-solid fa-plus text-xs"></i>
-              <span>Create Social Link</span>
+              {isSubmitting ? (
+                <>
+                  <i className="fa-solid fa-circle-notch fa-spin text-xs"></i>
+                  <span>Creating...</span>
+                </>
+              ) : (
+                <>
+                  <i className="fa-solid fa-plus text-xs"></i>
+                  <span>Create Social Link</span>
+                </>
+              )}
             </button>
           </div>
         </form>
@@ -1011,62 +1046,13 @@ const DEFAULT_MOCKUP_LABELS = [
 ];
 
 /**
- * Normalizes initial installation mockup data into structured objects { label, image }.
- *
- * Supports:
- * - Direct mockup objects: { label: string, image: string }
- * - Seed identifiers: 'carrara-room' -> converted to Picsum mockup image URL
- * - Web/Data URLs: 'https://...' or 'data:image/...'
- *
- * @param {Object|null} initialData - Tile data if in edit mode
- * @returns {Array<{label: string, image: string}>} - Array of normalized mockup objects (0 to 4)
- */
-const getInitialMockups = (initialData) => {
-  if (!initialData) return [];
-  const list = Array.isArray(initialData.mockups)
-    ? initialData.mockups
-    : Array.isArray(initialData.mockupSeeds)
-    ? initialData.mockupSeeds
-    : [];
-
-  if (list.length === 0) return [];
-
-  return list.slice(0, 4).map((item, index) => {
-    if (typeof item === 'object' && item !== null) {
-      return {
-        label:
-          item.label ||
-          item.name ||
-          DEFAULT_MOCKUP_LABELS[index] ||
-          `Mockup ${index + 1}`,
-        image: item.image || '',
-      };
-    }
-    if (typeof item === 'string') {
-      const isFullUrl =
-        item.startsWith('http://') ||
-        item.startsWith('https://') ||
-        item.startsWith('data:');
-      return {
-        label: DEFAULT_MOCKUP_LABELS[index] || `Mockup ${index + 1}`,
-        image: isFullUrl
-          ? item
-          : `https://picsum.photos/seed/${item}/800/600`,
-      };
-    }
-    return {
-      label: DEFAULT_MOCKUP_LABELS[index] || `Mockup ${index + 1}`,
-      image: '',
-    };
-  });
-};
-
-/**
  * TileForm handles creation and editing of tiles with all required fields,
- * image uploads (as data URLs or web URLs), PDF brochure, up to 4 orientations,
+ * image uploads, PDF brochure, and (create mode only) up to 4 orientations
  * and up to 4 installation mockups (minimum 0, maximum 4).
  */
 function TileForm({ initialData = null, onSubmit, onCancel }) {
+  const mode = initialData ? 'edit' : 'create';
+
   const [name, setName] = useState(initialData?.name || '');
   const [brand, setBrand] = useState(initialData?.brand || 'Marazzi');
   const [customBrand, setCustomBrand] = useState('');
@@ -1077,44 +1063,65 @@ function TileForm({ initialData = null, onSubmit, onCancel }) {
   const [badge, setBadge] = useState(initialData?.badge || 'none');
 
   // Technical Specs
-  const [thickness, setThickness] = useState(initialData?.specs?.thickness || '9mm');
-  const [finish, setFinish] = useState(initialData?.specs?.finish || 'Matte');
+  const [thickness, setThickness] = useState(initialData?.thickness || '9mm');
+  const [finish, setFinish] = useState(initialData?.finish || 'Matte');
   const [slipResistance, setSlipResistance] = useState(
-    initialData?.specs?.slipResistance || 'R10'
+    initialData?.slipResistance || 'R10'
   );
-  const [usage, setUsage] = useState(initialData?.specs?.usage || 'Floor & Wall');
+  const [usage, setUsage] = useState(initialData?.usage || 'Floor & Wall');
   const [description, setDescription] = useState(initialData?.description || '');
 
-  // Media
-  const [image, setImage] = useState(
-    initialData?.image || 'https://picsum.photos/seed/new-tile-sample/800/800'
+  // Media — real File objects for upload, plus a preview URL for display
+  const [imageFile, setImageFile] = useState(null);
+  const [imagePreviewUrl, setImagePreviewUrl] = useState(
+    resolveAssetUrl(initialData?.imagePath) || ''
   );
-  const [pdfUrl, setPdfUrl] = useState(initialData?.pdfUrl || '');
+  const [pdfFile, setPdfFile] = useState(null);
 
-  // Up to 4 orientations
-  const [orientations, setOrientations] = useState(
-    initialData?.orientations && initialData.orientations.length > 0
-      ? initialData.orientations.slice(0, 4)
+  // Up to 4 orientations. In edit mode, seeded from the tile's existing orientations
+  // (each carrying its real `id` so edits/removals can target it); in create mode,
+  // starts with two placeholder patterns the admin fills in.
+  const [orientations, setOrientations] = useState(() =>
+    initialData?.orientations?.length
+      ? initialData.orientations.map((o) => ({
+          id: o.id,
+          name: o.name,
+          imageFile: null,
+          previewUrl: resolveAssetUrl(o.imagePath),
+        }))
       : [
-          { name: 'Straight Lay', image: 'https://picsum.photos/seed/pattern-1/500/500' },
-          { name: 'Diagonal 45°', image: 'https://picsum.photos/seed/pattern-2/500/500' },
+          { id: null, name: 'Straight Lay', imageFile: null, previewUrl: '' },
+          { id: null, name: 'Diagonal 45°', imageFile: null, previewUrl: '' },
         ]
   );
 
-  // Up to 4 installation mockups (minimum 0, maximum 4)
-  const [mockups, setMockups] = useState(() => getInitialMockups(initialData));
+  // Up to 4 installation mockups (minimum 0, maximum 4). In edit mode, seeded from
+  // the tile's existing mockups the same way as orientations.
+  const [mockups, setMockups] = useState(() =>
+    initialData?.mockups?.length
+      ? initialData.mockups.map((m) => ({
+          id: m.id,
+          label: m.label,
+          imageFile: null,
+          previewUrl: resolveAssetUrl(m.imagePath),
+        }))
+      : []
+  );
+
+  // Ids of existing orientations/mockups the admin removed during this edit session —
+  // sent as removeOrientationIds/removeMockupIds on save.
+  const [removedOrientationIds, setRemovedOrientationIds] = useState([]);
+  const [removedMockupIds, setRemovedMockupIds] = useState([]);
 
   const [formError, setFormError] = useState('');
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
-  // Handle local image file upload converting to Data URL preview
-  const handleFileUpload = (e, callback) => {
+  // Store the picked File and compute an object-URL preview for it
+  const handleFileSelect = (e, setFileState, setPreviewState) => {
     const file = e.target.files?.[0];
     if (file) {
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        callback(reader.result);
-      };
-      reader.readAsDataURL(file);
+      setFileState(file);
+      if (setPreviewState) setPreviewState(URL.createObjectURL(file));
     }
   };
 
@@ -1123,15 +1130,17 @@ function TileForm({ initialData = null, onSubmit, onCancel }) {
     if (orientations.length >= 4) return;
     setOrientations((prev) => [
       ...prev,
-      {
-        name: `Pattern ${prev.length + 1}`,
-        image: `https://picsum.photos/seed/orientation-${Date.now()}/500/500`,
-      },
+      { id: null, name: `Pattern ${prev.length + 1}`, imageFile: null, previewUrl: '' },
     ]);
   };
 
-  // Remove orientation
+  // Remove orientation. If it's an existing one (has an id), queue it for deletion
+  // on save; brand-new, unsaved ones are just dropped from the form.
   const handleRemoveOrientation = (index) => {
+    const item = orientations[index];
+    if (item.id != null) {
+      setRemovedOrientationIds((prev) => [...prev, item.id]);
+    }
     setOrientations((prev) => prev.filter((_, i) => i !== index));
   };
 
@@ -1142,9 +1151,19 @@ function TileForm({ initialData = null, onSubmit, onCancel }) {
     );
   };
 
+  const handleOrientationFileChange = (index, e) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    setOrientations((prev) =>
+      prev.map((item, i) =>
+        i === index ? { ...item, imageFile: file, previewUrl: URL.createObjectURL(file) } : item
+      )
+    );
+  };
+
   /**
    * Add a new installation mockup scene (capped at 4 maximum).
-   * Automatically assigns sequential default label and placeholder seed.
+   * Automatically assigns sequential default label.
    */
   const handleAddMockup = () => {
     if (mockups.length >= 4) return;
@@ -1152,24 +1171,29 @@ function TileForm({ initialData = null, onSubmit, onCancel }) {
     setMockups((prev) => [
       ...prev,
       {
-        label:
-          DEFAULT_MOCKUP_LABELS[nextIdx] ||
-          `Installation Scene ${nextIdx + 1}`,
-        image: `https://picsum.photos/seed/mockup-${Date.now()}-${nextIdx + 1}/800/600`,
+        id: null,
+        label: DEFAULT_MOCKUP_LABELS[nextIdx] || `Installation Scene ${nextIdx + 1}`,
+        imageFile: null,
+        previewUrl: '',
       },
     ]);
   };
 
   /**
-   * Remove an installation mockup at a given index.
+   * Remove an installation mockup at a given index. If it's an existing one (has an
+   * id), queue it for deletion on save; brand-new, unsaved ones are just dropped.
    * Allows removing all mockups down to 0.
    */
   const handleRemoveMockup = (index) => {
+    const item = mockups[index];
+    if (item.id != null) {
+      setRemovedMockupIds((prev) => [...prev, item.id]);
+    }
     setMockups((prev) => prev.filter((_, i) => i !== index));
   };
 
   /**
-   * Update specific field ('label' or 'image') of a mockup at a given index.
+   * Update the label of a mockup at a given index.
    */
   const handleUpdateMockup = (index, field, value) => {
     setMockups((prev) =>
@@ -1177,8 +1201,18 @@ function TileForm({ initialData = null, onSubmit, onCancel }) {
     );
   };
 
-  // Form submission handler
-  const handleSubmit = (e) => {
+  const handleMockupFileChange = (index, e) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    setMockups((prev) =>
+      prev.map((item, i) =>
+        i === index ? { ...item, imageFile: file, previewUrl: URL.createObjectURL(file) } : item
+      )
+    );
+  };
+
+  // Form submission handler — builds a FormData request for the real backend API
+  const handleSubmit = async (e) => {
     e.preventDefault();
     setFormError('');
 
@@ -1190,30 +1224,123 @@ function TileForm({ initialData = null, onSubmit, onCancel }) {
     const finalBrand = brand === 'other' ? customBrand.trim() || 'Terra Tile Co.' : brand;
     const finalSize = size === 'other' ? customSize.trim() || '60x60' : size;
 
-    const newTileData = {
-      id: initialData?.id || Date.now(),
-      name: name.trim(),
-      brand: finalBrand,
-      size: finalSize,
-      color: color.trim().toLowerCase(),
-      type: type.trim().toLowerCase(),
-      badge: badge === 'none' ? null : badge,
-      description: description.trim() || 'Crafted with premium natural minerals.',
-      specs: {
-        thickness: thickness.trim(),
-        finish: finish.trim(),
-        slipResistance: slipResistance.trim(),
-        usage: usage.trim(),
-      },
-      image: image.trim(),
-      pdfUrl: pdfUrl.trim() ? pdfUrl.trim() : null,
-      orientations: orientations.slice(0, 4),
-      mockups: mockups.slice(0, 4),
-      mockupSeeds: mockups.slice(0, 4),
-      colors: initialData?.colors || ['#f5f2ed', '#ece6db', '#e0d8cc', '#d4c9b8'],
-    };
+    const formData = new FormData();
 
-    onSubmit(newTileData);
+    if (mode === 'create') {
+      if (!imageFile) {
+        setFormError('Please upload a main tile image.');
+        return;
+      }
+      if (!pdfFile) {
+        setFormError('Please upload a specification PDF.');
+        return;
+      }
+
+      formData.append('name', name.trim());
+      formData.append('brand', finalBrand);
+      formData.append('size', finalSize);
+      formData.append('color', color.trim().toLowerCase());
+      formData.append('type', type.trim().toLowerCase());
+      if (badge !== 'none') formData.append('badge', badge);
+      formData.append('description', description.trim() || 'Crafted with premium natural minerals.');
+      formData.append('thickness', thickness.trim());
+      formData.append('finish', finish.trim());
+      formData.append('slipResistance', slipResistance.trim());
+      formData.append('usage', usage.trim());
+      formData.append('image', imageFile);
+      formData.append('pdf', pdfFile);
+    } else {
+      const appendIfChanged = (key, currentValue, originalValue) => {
+        if (currentValue !== (originalValue || '')) formData.append(key, currentValue);
+      };
+
+      appendIfChanged('name', name.trim(), initialData.name);
+      appendIfChanged('brand', finalBrand, initialData.brand);
+      appendIfChanged('size', finalSize, initialData.size);
+      appendIfChanged('color', color.trim().toLowerCase(), initialData.color);
+      appendIfChanged('type', type.trim().toLowerCase(), initialData.type);
+
+      const currentBadge = badge === 'none' ? '' : badge;
+      if (currentBadge !== (initialData.badge || '')) {
+        formData.append('badge', currentBadge);
+      }
+
+      appendIfChanged('description', description.trim(), initialData.description);
+      appendIfChanged('thickness', thickness.trim(), initialData.thickness);
+      appendIfChanged('finish', finish.trim(), initialData.finish);
+      appendIfChanged('slipResistance', slipResistance.trim(), initialData.slipResistance);
+      appendIfChanged('usage', usage.trim(), initialData.usage);
+
+      if (imageFile) formData.append('image', imageFile);
+      if (pdfFile) formData.append('pdf', pdfFile);
+    }
+
+    // Orientations — new entries (no id) are sent when complete; existing ones (id
+    // present) are only sent if their name or image actually changed. Silently
+    // skipping incomplete new entries matches create mode's "half-filled defaults
+    // are just ignored" behavior.
+    const originalOrientationsById = new Map(
+      (initialData?.orientations || []).map((o) => [o.id, o])
+    );
+    let orientationOutIndex = 0;
+    orientations.forEach((item) => {
+      if (item.id == null) {
+        if (item.name?.trim() && item.imageFile) {
+          formData.append(`orientations[${orientationOutIndex}].name`, item.name.trim());
+          formData.append(`orientations[${orientationOutIndex}].image`, item.imageFile);
+          orientationOutIndex++;
+        }
+      } else {
+        const original = originalOrientationsById.get(item.id);
+        const nameChanged = item.name?.trim() && item.name.trim() !== (original?.name || '');
+        const imageChanged = !!item.imageFile;
+        if (nameChanged || imageChanged) {
+          formData.append(`orientations[${orientationOutIndex}].id`, item.id);
+          if (nameChanged) formData.append(`orientations[${orientationOutIndex}].name`, item.name.trim());
+          if (imageChanged) formData.append(`orientations[${orientationOutIndex}].image`, item.imageFile);
+          orientationOutIndex++;
+        }
+      }
+    });
+    removedOrientationIds.forEach((id) => formData.append('removeOrientationIds', id));
+
+    // Mockups — same shared logic as orientations, minus the max-count concept.
+    const originalMockupsById = new Map((initialData?.mockups || []).map((m) => [m.id, m]));
+    let mockupOutIndex = 0;
+    mockups.forEach((item) => {
+      if (item.id == null) {
+        if (item.label?.trim() && item.imageFile) {
+          formData.append(`mockups[${mockupOutIndex}].label`, item.label.trim());
+          formData.append(`mockups[${mockupOutIndex}].image`, item.imageFile);
+          mockupOutIndex++;
+        }
+      } else {
+        const original = originalMockupsById.get(item.id);
+        const labelChanged = item.label?.trim() && item.label.trim() !== (original?.label || '');
+        const imageChanged = !!item.imageFile;
+        if (labelChanged || imageChanged) {
+          formData.append(`mockups[${mockupOutIndex}].id`, item.id);
+          if (labelChanged) formData.append(`mockups[${mockupOutIndex}].label`, item.label.trim());
+          if (imageChanged) formData.append(`mockups[${mockupOutIndex}].image`, item.imageFile);
+          mockupOutIndex++;
+        }
+      }
+    });
+    removedMockupIds.forEach((id) => formData.append('removeMockupIds', id));
+
+    if (mode === 'edit' && [...formData.keys()].length === 0) {
+      setFormError('No changes detected — modify a field before saving.');
+      return;
+    }
+
+    setIsSubmitting(true);
+    try {
+      await onSubmit(formData, name.trim());
+    } catch (err) {
+      setFormError('Failed to save tile. Please check required fields and try again.');
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
@@ -1455,35 +1582,33 @@ function TileForm({ initialData = null, onSubmit, onCancel }) {
           {/* Main Swatch Image */}
           <div className="p-5 bg-[#FAF7F4] rounded-2xl border border-[#F0E8DF]">
             <label className="text-xs font-bold uppercase tracking-wider text-[#3D3229] block mb-2">
-              Main Tile Swatch Image *
+              Main Tile Swatch Image {mode === 'create' && '*'}
             </label>
             <div className="flex gap-4 items-start">
               <div className="w-20 h-20 rounded-xl overflow-hidden bg-white border border-[#F0E8DF] shrink-0 shadow-xs">
                 <img
-                  src={image || 'https://via.placeholder.com/150'}
+                  src={imagePreviewUrl || 'https://via.placeholder.com/150'}
                   alt="Preview"
                   className="w-full h-full object-cover"
                 />
               </div>
               <div className="flex-1 space-y-2">
-                <input
-                  type="text"
-                  value={image}
-                  onChange={(e) => setImage(e.target.value)}
-                  placeholder="Image URL (e.g. https://...)"
-                  className="w-full px-3 py-1.5 border border-[#F0E8DF] rounded-lg text-xs bg-white focus:outline-none focus:border-[#C2784A]"
-                />
                 <div>
                   <label className="inline-flex items-center gap-1.5 px-3 py-1 bg-white border border-[#F0E8DF] hover:border-[#C2784A] text-[#6B5D51] hover:text-[#3D3229] rounded-lg text-xs font-medium cursor-pointer transition-all">
                     <i className="fa-solid fa-upload text-[10px]"></i> Upload Image File
                     <input
                       type="file"
-                      accept="image/*"
-                      onChange={(e) => handleFileUpload(e, setImage)}
+                      accept="image/jpeg,image/png"
+                      onChange={(e) => handleFileSelect(e, setImageFile, setImagePreviewUrl)}
                       className="hidden"
                     />
                   </label>
                 </div>
+                {mode === 'edit' && (
+                  <p className="text-[11px] text-[#A89885]">
+                    Upload a new file to replace the existing image.
+                  </p>
+                )}
               </div>
             </div>
           </div>
@@ -1491,26 +1616,29 @@ function TileForm({ initialData = null, onSubmit, onCancel }) {
           {/* Specification PDF Sheet */}
           <div className="p-5 bg-[#FAF7F4] rounded-2xl border border-[#F0E8DF]">
             <label className="text-xs font-bold uppercase tracking-wider text-[#3D3229] block mb-2">
-              Brochure / Specification Sheet (PDF)
+              Brochure / Specification Sheet (PDF) {mode === 'create' && '*'}
             </label>
             <p className="text-xs text-[#6B5D51] mb-2">
-              Optional link or PDF document for technical download button.
+              {mode === 'edit'
+                ? 'Upload a new PDF to replace the existing one.'
+                : 'PDF document for the technical download button.'}
             </p>
             <div className="space-y-2">
-              <input
-                type="text"
-                value={pdfUrl}
-                onChange={(e) => setPdfUrl(e.target.value)}
-                placeholder="PDF link (e.g. https://.../specs.pdf)"
-                className="w-full px-3 py-2 border border-[#F0E8DF] rounded-lg text-xs bg-white focus:outline-none focus:border-[#C2784A]"
-              />
+              {pdfFile && (
+                <p className="text-xs text-[#6B5D51] flex items-center gap-1.5">
+                  <i className="fa-solid fa-file-pdf text-[#C2784A]"></i> {pdfFile.name}
+                </p>
+              )}
+              {!pdfFile && mode === 'edit' && initialData?.pdfPath && (
+                <p className="text-xs text-[#A89885]">Existing PDF on file</p>
+              )}
               <div>
                 <label className="inline-flex items-center gap-1.5 px-3 py-1 bg-white border border-[#F0E8DF] hover:border-[#C2784A] text-[#6B5D51] hover:text-[#3D3229] rounded-lg text-xs font-medium cursor-pointer transition-all">
                   <i className="fa-solid fa-file-pdf text-[#C2784A]"></i> Upload PDF File
                   <input
                     type="file"
                     accept="application/pdf"
-                    onChange={(e) => handleFileUpload(e, setPdfUrl)}
+                    onChange={(e) => handleFileSelect(e, setPdfFile, null)}
                     className="hidden"
                   />
                 </label>
@@ -1546,7 +1674,7 @@ function TileForm({ initialData = null, onSubmit, onCancel }) {
             >
               <div className="aspect-square rounded-xl overflow-hidden bg-white border border-[#F0E8DF] mb-3 relative">
                 <img
-                  src={item.image}
+                  src={item.previewUrl || 'https://via.placeholder.com/300?text=No+Image'}
                   alt={item.name}
                   className="w-full h-full object-cover"
                 />
@@ -1554,12 +1682,8 @@ function TileForm({ initialData = null, onSubmit, onCancel }) {
                   <i className="fa-solid fa-camera"></i>
                   <input
                     type="file"
-                    accept="image/*"
-                    onChange={(e) =>
-                      handleFileUpload(e, (dataUrl) =>
-                        handleUpdateOrientation(idx, 'image', dataUrl)
-                      )
-                    }
+                    accept="image/jpeg,image/png"
+                    onChange={(e) => handleOrientationFileChange(idx, e)}
                     className="hidden"
                   />
                 </label>
@@ -1632,16 +1756,9 @@ function TileForm({ initialData = null, onSubmit, onCancel }) {
                 <div>
                   <div className="aspect-[4/3] rounded-xl overflow-hidden bg-white border border-[#F0E8DF] mb-3 relative">
                     <img
-                      src={
-                        item.image ||
-                        'https://via.placeholder.com/400x300?text=No+Image'
-                      }
+                      src={item.previewUrl || 'https://via.placeholder.com/400x300?text=No+Image'}
                       alt={item.label || `Mockup ${idx + 1}`}
                       className="w-full h-full object-cover"
-                      onError={(e) => {
-                        e.currentTarget.src =
-                          'https://via.placeholder.com/400x300?text=Invalid+Image+URL';
-                      }}
                     />
                     <label
                       className="absolute bottom-2 right-2 bg-[#3D3229]/80 hover:bg-[#C2784A] text-white p-1.5 rounded-lg text-[10px] cursor-pointer backdrop-blur-xs transition-all"
@@ -1650,12 +1767,8 @@ function TileForm({ initialData = null, onSubmit, onCancel }) {
                       <i className="fa-solid fa-camera"></i>
                       <input
                         type="file"
-                        accept="image/*"
-                        onChange={(e) =>
-                          handleFileUpload(e, (dataUrl) =>
-                            handleUpdateMockup(idx, 'image', dataUrl)
-                          )
-                        }
+                        accept="image/jpeg,image/png"
+                        onChange={(e) => handleMockupFileChange(idx, e)}
                         className="hidden"
                       />
                     </label>
@@ -1674,21 +1787,6 @@ function TileForm({ initialData = null, onSubmit, onCancel }) {
                         }
                         placeholder="e.g. Room Installation"
                         className="w-full px-2.5 py-1.5 border border-[#F0E8DF] rounded-lg text-xs bg-white focus:outline-none focus:border-[#C2784A] font-medium text-[#3D3229]"
-                      />
-                    </div>
-
-                    <div>
-                      <label className="text-[10px] font-bold uppercase tracking-wider text-[#A89885] block mb-1">
-                        Image URL / Source
-                      </label>
-                      <input
-                        type="text"
-                        value={item.image}
-                        onChange={(e) =>
-                          handleUpdateMockup(idx, 'image', e.target.value)
-                        }
-                        placeholder="Image URL or upload"
-                        className="w-full px-2.5 py-1.5 border border-[#F0E8DF] rounded-lg text-xs bg-white focus:outline-none focus:border-[#C2784A] text-[#6B5D51]"
                       />
                     </div>
                   </div>
@@ -1722,10 +1820,20 @@ function TileForm({ initialData = null, onSubmit, onCancel }) {
 
         <button
           type="submit"
-          className="inline-flex items-center gap-2 px-8 py-3 bg-[#C2784A] hover:bg-[#A85D32] text-white rounded-full text-sm font-semibold transition-all shadow-md hover:shadow-lg cursor-pointer"
+          disabled={isSubmitting}
+          className="inline-flex items-center gap-2 px-8 py-3 bg-[#C2784A] hover:bg-[#A85D32] text-white rounded-full text-sm font-semibold transition-all shadow-md hover:shadow-lg cursor-pointer disabled:opacity-70"
         >
-          <i className="fa-solid fa-floppy-disk text-xs"></i>
-          <span>{initialData ? 'Save Changes' : 'Add Tile to Catalog'}</span>
+          {isSubmitting ? (
+            <>
+              <i className="fa-solid fa-circle-notch fa-spin text-xs"></i>
+              <span>Saving...</span>
+            </>
+          ) : (
+            <>
+              <i className="fa-solid fa-floppy-disk text-xs"></i>
+              <span>{mode === 'edit' ? 'Save Changes' : 'Add Tile to Catalog'}</span>
+            </>
+          )}
         </button>
       </div>
     </form>

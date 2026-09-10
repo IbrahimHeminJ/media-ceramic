@@ -7,18 +7,34 @@ import TileModal from './components/TileModal';
 import Login from './components/Login';
 import Dashboard from './components/Dashboard';
 import Footer from './components/Footer';
-import { tilesData } from './data/tilesData';
-import { initialSocialLinks } from './data/socialData';
+import { getAllTiles, createTile, updateTile, deleteTile } from './api/tilesApi';
+import { getAllSocialLinks, createSocialLink, deleteSocialLink } from './api/socialLinksApi';
 
 export default function App() {
   const [currentPage, setCurrentPage] = useState('home');
   const [selectedTile, setSelectedTile] = useState(null);
 
   // Central tiles collection state (supports CRUD across Catalog & Dashboard)
-  const [tiles, setTiles] = useState(tilesData);
+  const [tiles, setTiles] = useState([]);
 
   // Central social links state (supports Add/Delete across Social page & Dashboard)
-  const [socialLinks, setSocialLinks] = useState(initialSocialLinks);
+  const [socialLinks, setSocialLinks] = useState([]);
+
+  // Fetch live catalog data from the backend on mount
+  useEffect(() => {
+    (async () => {
+      try {
+        const [tilesResult, socialLinksResult] = await Promise.all([
+          getAllTiles(),
+          getAllSocialLinks(),
+        ]);
+        setTiles(tilesResult);
+        setSocialLinks(socialLinksResult);
+      } catch (err) {
+        console.error('Failed to load catalog data:', err);
+      }
+    })();
+  }, []);
 
   // Authentication state (persisted across session refreshes)
   const [currentUser, setCurrentUser] = useState(() => {
@@ -120,6 +136,10 @@ export default function App() {
 
   /**
    * Handler for successful login submission.
+   * Navigates directly (rather than via navigateTo) since `currentUser` in this
+   * closure is still stale until the setCurrentUser state update is applied —
+   * navigateTo('dashboard') would otherwise see the pre-login value and bounce
+   * back to /login.
    */
   const handleLoginSuccess = (userData) => {
     setCurrentUser(userData);
@@ -128,8 +148,10 @@ export default function App() {
     } catch {
       // Ignore storage errors
     }
-    // Redirect to dashboard upon successful authentication
-    navigateTo('dashboard');
+    setSelectedTile(null);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+    setCurrentPage('dashboard');
+    window.history.pushState({}, '', '/dashboard');
   };
 
   /**
@@ -148,28 +170,34 @@ export default function App() {
   /**
    * CRUD Handlers for Dashboard tile management
    */
-  const handleAddTile = (newTile) => {
-    setTiles((prev) => [newTile, ...prev]);
+  const handleAddTile = async (formData) => {
+    const res = await createTile(formData);
+    setTiles((prev) => [res.data, ...prev]);
+    return res.data;
   };
 
-  const handleUpdateTile = (updatedTile) => {
-    setTiles((prev) =>
-      prev.map((t) => (t.id === updatedTile.id ? updatedTile : t))
-    );
+  const handleUpdateTile = async (id, formData) => {
+    const res = await updateTile(id, formData);
+    setTiles((prev) => prev.map((t) => (t.id === id ? res.data : t)));
+    return res.data;
   };
 
-  const handleDeleteTile = (tileId) => {
+  const handleDeleteTile = async (tileId) => {
+    await deleteTile(tileId);
     setTiles((prev) => prev.filter((t) => t.id !== tileId));
   };
 
   /**
    * CRUD Handlers for Social Links management
    */
-  const handleAddSocialLink = (newLink) => {
-    setSocialLinks((prev) => [...prev, newLink]);
+  const handleAddSocialLink = async (payload) => {
+    const res = await createSocialLink(payload);
+    setSocialLinks((prev) => [...prev, res.data]);
+    return res.data;
   };
 
-  const handleDeleteSocialLink = (linkId) => {
+  const handleDeleteSocialLink = async (linkId) => {
+    await deleteSocialLink(linkId);
     setSocialLinks((prev) => prev.filter((link) => link.id !== linkId));
   };
 

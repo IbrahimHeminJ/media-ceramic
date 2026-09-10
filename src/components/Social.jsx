@@ -1,6 +1,5 @@
 import React from 'react';
 import { useTranslation } from 'react-i18next';
-import { initialSocialLinks } from '../data/socialData';
 
 /**
  * Normalizes destination URLs so external links always open in external pages
@@ -36,7 +35,7 @@ const formatDestinationUrl = (url) => {
  * Renders the social links hub page.
  * Dynamically maps `socialLinks` passed from state.
  */
-export default function Social({ socialLinks = initialSocialLinks, onNavigate }) {
+export default function Social({ socialLinks = [], onNavigate }) {
   const { t } = useTranslation();
 
   return (

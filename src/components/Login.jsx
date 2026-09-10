@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import { login } from '../api/authApi';
 
 /**
  * Login Component
@@ -16,10 +17,9 @@ export default function Login({ onLoginSuccess, onNavigateHome }) {
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   /**
-   * Handles login form submission.
-   * Designed to easily integrate with real backend authentication endpoints.
+   * Handles login form submission against the real backend authentication endpoint.
    */
-  const handleLoginSubmit = (e) => {
+  const handleLoginSubmit = async (e) => {
     e.preventDefault();
     setErrorMessage('');
 
@@ -31,20 +31,14 @@ export default function Login({ onLoginSuccess, onNavigateHome }) {
 
     setIsSubmitting(true);
 
-    // Mock authentication check (in future: replace with real backend API request)
-    setTimeout(() => {
-      // Allow login with credentials (e.g. admin/admin or any valid input)
-      if (
-        (username.trim().toLowerCase() === 'admin' && password === 'admin123') ||
-        (username.trim().length >= 3 && password.length >= 4)
-      ) {
-        setIsSubmitting(false);
-        onLoginSuccess({ username: username.trim() });
-      } else {
-        setIsSubmitting(false);
-        setErrorMessage(t('login.errorInvalid', 'Invalid username or password. Please try again.'));
-      }
-    }, 400);
+    try {
+      const { token } = await login(username.trim(), password);
+      setIsSubmitting(false);
+      onLoginSuccess({ username: username.trim(), token });
+    } catch (err) {
+      setIsSubmitting(false);
+      setErrorMessage(t('login.errorInvalid', 'Invalid username or password. Please try again.'));
+    }
   };
 
   return (

@@ -1,6 +1,6 @@
 import React, { useState, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
-import { tilesData } from '../data/tilesData';
+import { resolveAssetUrl } from '../api/client';
 
 /**
  * Filter controls component.
@@ -192,7 +192,7 @@ function FilterControls({
   );
 }
 
-export default function Tiles({ tiles = tilesData, onSelectTile }) {
+export default function Tiles({ tiles = [], onSelectTile }) {
   const { t } = useTranslation();
 
   // Mobile/Tablet expandable section state (hidden by default on screens < 1024px)
@@ -246,7 +246,7 @@ export default function Tiles({ tiles = tilesData, onSelectTile }) {
   }, [filters]);
 
   const filteredTiles = useMemo(() => {
-    return (tiles || tilesData).filter((tile) => {
+    return (tiles || []).filter((tile) => {
       if (filters.size !== 'all' && tile.size !== filters.size) return false;
       if (filters.color !== 'all' && tile.color !== filters.color) return false;
       if (filters.type !== 'all' && tile.type !== filters.type) return false;
@@ -579,7 +579,7 @@ export default function Tiles({ tiles = tilesData, onSelectTile }) {
                   {/* Tile Swatch Image Box */}
                   <div className="aspect-square relative overflow-hidden bg-[#FAF7F4] flex items-center justify-center">
                     <img
-                      src={tile.image || `https://picsum.photos/seed/${tile.id}-tile/600/600`}
+                      src={resolveAssetUrl(tile.imagePath) || `https://picsum.photos/seed/${tile.id}-tile/600/600`}
                       alt={tile.name}
                       loading="lazy"
                       className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
