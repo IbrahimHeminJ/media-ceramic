@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useRef, useEffect } from 'react';
 import { resolveAssetUrl } from '../api/client';
 
 /**
@@ -1043,6 +1043,128 @@ const DEFAULT_MOCKUP_LABELS = [
 ];
 
 /**
+ * Themed free-text combobox: a text input paired with a click-to-open suggestion
+ * list styled to match the site, replacing the browser's own (unstyleable)
+ * <input list="..."> + <datalist> popup. Typing is always allowed — suggestions
+ * are just a shortcut, not a constraint.
+ */
+function ThemedCombobox({ value, onChange, options, placeholder, required, className = '' }) {
+  const [isOpen, setIsOpen] = useState(false);
+  const containerRef = useRef(null);
+
+  useEffect(() => {
+    const handleClickOutside = (e) => {
+      if (containerRef.current && !containerRef.current.contains(e.target)) {
+        setIsOpen(false);
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
+
+  const query = value.trim().toLowerCase();
+  const filteredOptions = query
+    ? options.filter((opt) => opt.toLowerCase().includes(query))
+    : options;
+
+  return (
+    <div ref={containerRef} className={`relative ${className}`}>
+      <input
+        type="text"
+        required={required}
+        value={value}
+        onChange={(e) => onChange(e.target.value)}
+        onFocus={() => setIsOpen(true)}
+        placeholder={placeholder}
+        autoComplete="off"
+        className="w-full px-4 py-2.5 border-2 border-[#F0E8DF] rounded-xl text-sm bg-[#FAF7F4] focus:outline-none focus:border-[#C2784A] text-[#3D3229]"
+      />
+      {isOpen && filteredOptions.length > 0 && (
+        <div className="absolute z-20 mt-1.5 w-full bg-white border-2 border-[#F0E8DF] rounded-xl shadow-lg overflow-hidden max-h-52 overflow-y-auto">
+          {filteredOptions.map((opt) => (
+            <button
+              key={opt}
+              type="button"
+              onClick={() => {
+                onChange(opt);
+                setIsOpen(false);
+              }}
+              className={`w-full text-left px-4 py-2 text-sm capitalize transition-colors cursor-pointer ${
+                opt.toLowerCase() === query
+                  ? 'bg-[#F5EDE4] text-[#A85D32] font-semibold'
+                  : 'text-[#3D3229] hover:bg-[#FAF7F4]'
+              }`}
+            >
+              {opt}
+            </button>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
+
+/**
+ * Themed fixed-choice select: a button + custom dropdown panel styled to match the
+ * site, replacing the browser's own (unstyleable) native <select> popup.
+ */
+function ThemedSelect({ value, onChange, options, className = '' }) {
+  const [isOpen, setIsOpen] = useState(false);
+  const containerRef = useRef(null);
+
+  useEffect(() => {
+    const handleClickOutside = (e) => {
+      if (containerRef.current && !containerRef.current.contains(e.target)) {
+        setIsOpen(false);
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
+
+  const selected = options.find((opt) => opt.value === value);
+
+  return (
+    <div ref={containerRef} className={`relative ${className}`}>
+      <button
+        type="button"
+        onClick={() => setIsOpen((prev) => !prev)}
+        className="w-full flex items-center justify-between gap-2 px-4 py-2.5 border-2 border-[#F0E8DF] rounded-xl text-sm bg-[#FAF7F4] hover:border-[#D4956A] focus:outline-none focus:border-[#C2784A] text-[#3D3229] cursor-pointer transition-all"
+      >
+        <span>{selected?.label ?? ''}</span>
+        <i
+          className={`fa-solid fa-chevron-down text-[10px] text-[#A89885] transition-transform ${
+            isOpen ? 'rotate-180' : ''
+          }`}
+        ></i>
+      </button>
+
+      {isOpen && (
+        <div className="absolute z-20 mt-1.5 w-full bg-white border-2 border-[#F0E8DF] rounded-xl shadow-lg overflow-hidden">
+          {options.map((opt) => (
+            <button
+              key={opt.value}
+              type="button"
+              onClick={() => {
+                onChange(opt.value);
+                setIsOpen(false);
+              }}
+              className={`w-full text-left px-4 py-2.5 text-sm transition-colors cursor-pointer ${
+                opt.value === value
+                  ? 'bg-[#F5EDE4] text-[#A85D32] font-semibold'
+                  : 'text-[#3D3229] hover:bg-[#FAF7F4]'
+              }`}
+            >
+              {opt.label}
+            </button>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
+
+/**
  * TileForm handles creation and editing of tiles with all required fields,
  * image uploads, PDF brochure, and (create mode only) up to 4 orientations
  * and up to 4 installation mockups (minimum 0, maximum 4).
@@ -1053,13 +1175,13 @@ function TileForm({ initialData = null, onSubmit, onCancel, tiles = [] }) {
   const mergeUnique = (defaults, dynamic) => [...new Set([...defaults, ...dynamic])].sort();
 
   const brandOptions = mergeUnique([], tiles.map(t => t.brand).filter(Boolean));
-  const sizeOptions = mergeUnique(['60x60', '30x60', '30x30', '20x120'], tiles.map(t => t.size).filter(Boolean));
-  const colorOptions = mergeUnique(['white', 'beige', 'gray', 'brown', 'terracotta'], tiles.map(t => t.color).filter(Boolean));
-  const typeOptions = mergeUnique(['porcelain', 'ceramic', 'marble', 'terrazzo'], tiles.map(t => t.type).filter(Boolean));
-  const thicknessOptions = mergeUnique(['9mm', '10mm', '12mm'], tiles.map(t => t.thickness).filter(Boolean));
-  const finishOptions = mergeUnique(['Matte', 'Honed', 'Polished'], tiles.map(t => t.finish).filter(Boolean));
-  const slipResistanceOptions = mergeUnique(['R9', 'R10', 'R11', 'R12'], tiles.map(t => t.slipResistance).filter(Boolean));
-  const usageOptions = mergeUnique(['Floor & Wall', 'Floor Only', 'Wall Only'], tiles.map(t => t.usage).filter(Boolean));
+  const sizeOptions = mergeUnique(['10x10', '10x20', '15x15', '20x20', '30x30', '30x60', '40x40', '45x45', '60x60', '60x120', '80x80', '120x120'], tiles.map(t => t.size).filter(Boolean));
+  const colorOptions = mergeUnique(['white', 'gray', 'beige', 'black', 'cream', 'charcoal', 'brown', 'taupe', 'blue', 'green', 'terracotta'], tiles.map(t => t.color).filter(Boolean));
+  const typeOptions = mergeUnique(['ceramic', 'porcelain', 'marble', 'granite', 'travertine', 'slate', 'mosaic', 'glass', 'terrazzo', 'quarry', 'cement', 'limestone'], tiles.map(t => t.type).filter(Boolean));
+  const thicknessOptions = mergeUnique(['6mm', '8mm', '9mm', '10mm', '11mm', '12mm', '14mm', '20mm'], tiles.map(t => t.thickness).filter(Boolean));
+  const finishOptions = mergeUnique(['glossy', 'matte', 'polished', 'honed', 'satin', 'lappato', 'textured', 'bush-hammered', 'flamed', 'anti-slip'], tiles.map(t => t.finish).filter(Boolean));
+  const slipResistanceOptions = mergeUnique(['R9', 'R10', 'R11', 'R12', 'R13', 'Class A', 'Class B', 'Class C', 'P1', 'P2', 'P3', 'P4', 'P5', 'DCOF >= 0.42'], tiles.map(t => t.slipResistance).filter(Boolean));
+  const usageOptions = mergeUnique(['floor', 'wall', 'indoor', 'outdoor', 'bathroom', 'kitchen', 'backsplash', 'shower', 'patio', 'pool', 'heavy commercial', 'residential'], tiles.map(t => t.usage).filter(Boolean));
 
   const [name, setName] = useState(initialData?.name || '');
   const [brand, setBrand] = useState(initialData?.brand || '');
@@ -1086,7 +1208,7 @@ function TileForm({ initialData = null, onSubmit, onCancel, tiles = [] }) {
 
   // Up to 4 orientations. In edit mode, seeded from the tile's existing orientations
   // (each carrying its real `id` so edits/removals can target it); in create mode,
-  // starts with two placeholder patterns the admin fills in.
+  // starts empty — the admin adds patterns via "Add Pattern".
   const [orientations, setOrientations] = useState(() =>
     initialData?.orientations?.length
       ? initialData.orientations.map((o) => ({
@@ -1095,10 +1217,7 @@ function TileForm({ initialData = null, onSubmit, onCancel, tiles = [] }) {
         imageFile: null,
         previewUrl: resolveAssetUrl(o.imagePath),
       }))
-      : [
-        { id: null, name: 'Straight Lay', imageFile: null, previewUrl: '' },
-        { id: null, name: 'Diagonal 45°', imageFile: null, previewUrl: '' },
-      ]
+      : []
   );
 
   // Up to 4 installation mockups (minimum 0, maximum 4). In edit mode, seeded from
@@ -1392,18 +1511,13 @@ function TileForm({ initialData = null, onSubmit, onCancel, tiles = [] }) {
             <label className="text-[11px] font-bold uppercase tracking-wider text-[#A89885] block mb-1.5">
               Brand / Manufacturer *
             </label>
-            <input
-              type="text"
-              list="brand-options"
+            <ThemedCombobox
               value={brand}
-              onChange={(e) => setBrand(e.target.value)}
+              onChange={setBrand}
+              options={brandOptions}
               placeholder="e.g. Marazzi"
               required
-              className="w-full px-4 py-2.5 border-2 border-[#F0E8DF] rounded-xl text-sm bg-[#FAF7F4] focus:outline-none focus:border-[#C2784A] text-[#3D3229]"
             />
-            <datalist id="brand-options">
-              {brandOptions.map((opt, i) => <option key={`brand-${i}`} value={opt} />)}
-            </datalist>
           </div>
 
           {/* Size */}
@@ -1411,18 +1525,13 @@ function TileForm({ initialData = null, onSubmit, onCancel, tiles = [] }) {
             <label className="text-[11px] font-bold uppercase tracking-wider text-[#A89885] block mb-1.5">
               Size Format *
             </label>
-            <input
-              type="text"
-              list="size-options"
+            <ThemedCombobox
               value={size}
-              onChange={(e) => setSize(e.target.value)}
+              onChange={setSize}
+              options={sizeOptions}
               placeholder="e.g. 60x60"
               required
-              className="w-full px-4 py-2.5 border-2 border-[#F0E8DF] rounded-xl text-sm bg-[#FAF7F4] focus:outline-none focus:border-[#C2784A] text-[#3D3229]"
             />
-            <datalist id="size-options">
-              {sizeOptions.map((opt, i) => <option key={`size-${i}`} value={opt} />)}
-            </datalist>
           </div>
 
           {/* Color Category */}
@@ -1430,18 +1539,13 @@ function TileForm({ initialData = null, onSubmit, onCancel, tiles = [] }) {
             <label className="text-[11px] font-bold uppercase tracking-wider text-[#A89885] block mb-1.5">
               Color Palette *
             </label>
-            <input
-              type="text"
-              list="color-options"
+            <ThemedCombobox
               value={color}
-              onChange={(e) => setColor(e.target.value)}
+              onChange={setColor}
+              options={colorOptions}
               placeholder="e.g. White"
               required
-              className="w-full px-4 py-2.5 border-2 border-[#F0E8DF] rounded-xl text-sm bg-[#FAF7F4] focus:outline-none focus:border-[#C2784A] text-[#3D3229]"
             />
-            <datalist id="color-options">
-              {colorOptions.map((opt, i) => <option key={`color-${i}`} value={opt} />)}
-            </datalist>
           </div>
 
           {/* Material Type */}
@@ -1449,18 +1553,13 @@ function TileForm({ initialData = null, onSubmit, onCancel, tiles = [] }) {
             <label className="text-[11px] font-bold uppercase tracking-wider text-[#A89885] block mb-1.5">
               Material Type *
             </label>
-            <input
-              type="text"
-              list="type-options"
+            <ThemedCombobox
               value={type}
-              onChange={(e) => setType(e.target.value)}
+              onChange={setType}
+              options={typeOptions}
               placeholder="e.g. Porcelain"
               required
-              className="w-full px-4 py-2.5 border-2 border-[#F0E8DF] rounded-xl text-sm bg-[#FAF7F4] focus:outline-none focus:border-[#C2784A] text-[#3D3229]"
             />
-            <datalist id="type-options">
-              {typeOptions.map((opt, i) => <option key={`type-${i}`} value={opt} />)}
-            </datalist>
           </div>
 
           {/* Badge */}
@@ -1468,16 +1567,16 @@ function TileForm({ initialData = null, onSubmit, onCancel, tiles = [] }) {
             <label className="text-[11px] font-bold uppercase tracking-wider text-[#A89885] block mb-1.5">
               Catalog Badge
             </label>
-            <select
+            <ThemedSelect
               value={badge}
-              onChange={(e) => setBadge(e.target.value)}
-              className="w-full px-4 py-2.5 border-2 border-[#F0E8DF] rounded-xl text-sm bg-[#FAF7F4] focus:outline-none focus:border-[#C2784A] text-[#3D3229]"
-            >
-              <option value="none">None (Standard)</option>
-              <option value="featured">Featured (Gold)</option>
-              <option value="popular">Popular (Red)</option>
-              <option value="new">New (Green)</option>
-            </select>
+              onChange={setBadge}
+              options={[
+                { value: 'none', label: 'None (Standard)' },
+                { value: 'featured', label: 'Featured (Gold)' },
+                { value: 'popular', label: 'Popular (Red)' },
+                { value: 'new', label: 'New (Green)' },
+              ]}
+            />
           </div>
         </div>
       </div>
@@ -1494,17 +1593,12 @@ function TileForm({ initialData = null, onSubmit, onCancel, tiles = [] }) {
             <label className="text-[11px] font-bold uppercase tracking-wider text-[#A89885] block mb-1.5">
               Thickness
             </label>
-            <input
-              type="text"
-              list="thickness-options"
+            <ThemedCombobox
               value={thickness}
-              onChange={(e) => setThickness(e.target.value)}
+              onChange={setThickness}
+              options={thicknessOptions}
               placeholder="e.g. 9mm or 10mm"
-              className="w-full px-4 py-2.5 border-2 border-[#F0E8DF] rounded-xl text-sm bg-[#FAF7F4] focus:outline-none focus:border-[#C2784A] text-[#3D3229]"
             />
-            <datalist id="thickness-options">
-              {thicknessOptions.map((opt, i) => <option key={`thickness-${i}`} value={opt} />)}
-            </datalist>
           </div>
 
           {/* Finish */}
@@ -1512,17 +1606,12 @@ function TileForm({ initialData = null, onSubmit, onCancel, tiles = [] }) {
             <label className="text-[11px] font-bold uppercase tracking-wider text-[#A89885] block mb-1.5">
               Surface Finish
             </label>
-            <input
-              type="text"
-              list="finish-options"
+            <ThemedCombobox
               value={finish}
-              onChange={(e) => setFinish(e.target.value)}
+              onChange={setFinish}
+              options={finishOptions}
               placeholder="e.g. Matte, Honed, Polished"
-              className="w-full px-4 py-2.5 border-2 border-[#F0E8DF] rounded-xl text-sm bg-[#FAF7F4] focus:outline-none focus:border-[#C2784A] text-[#3D3229]"
             />
-            <datalist id="finish-options">
-              {finishOptions.map((opt, i) => <option key={`finish-${i}`} value={opt} />)}
-            </datalist>
           </div>
 
           {/* Slip Resistance */}
@@ -1530,17 +1619,12 @@ function TileForm({ initialData = null, onSubmit, onCancel, tiles = [] }) {
             <label className="text-[11px] font-bold uppercase tracking-wider text-[#A89885] block mb-1.5">
               Slip Resistance
             </label>
-            <input
-              type="text"
-              list="slip-resistance-options"
+            <ThemedCombobox
               value={slipResistance}
-              onChange={(e) => setSlipResistance(e.target.value)}
+              onChange={setSlipResistance}
+              options={slipResistanceOptions}
               placeholder="e.g. R9, R10, R11, R12"
-              className="w-full px-4 py-2.5 border-2 border-[#F0E8DF] rounded-xl text-sm bg-[#FAF7F4] focus:outline-none focus:border-[#C2784A] text-[#3D3229]"
             />
-            <datalist id="slip-resistance-options">
-              {slipResistanceOptions.map((opt, i) => <option key={`slip-${i}`} value={opt} />)}
-            </datalist>
           </div>
 
           {/* Usage */}
@@ -1548,17 +1632,12 @@ function TileForm({ initialData = null, onSubmit, onCancel, tiles = [] }) {
             <label className="text-[11px] font-bold uppercase tracking-wider text-[#A89885] block mb-1.5">
               Recommended Usage
             </label>
-            <input
-              type="text"
-              list="usage-options"
+            <ThemedCombobox
               value={usage}
-              onChange={(e) => setUsage(e.target.value)}
+              onChange={setUsage}
+              options={usageOptions}
               placeholder="e.g. Floor & Wall"
-              className="w-full px-4 py-2.5 border-2 border-[#F0E8DF] rounded-xl text-sm bg-[#FAF7F4] focus:outline-none focus:border-[#C2784A] text-[#3D3229]"
             />
-            <datalist id="usage-options">
-              {usageOptions.map((opt, i) => <option key={`usage-${i}`} value={opt} />)}
-            </datalist>
           </div>
         </div>
       </div>
@@ -1671,50 +1750,62 @@ function TileForm({ initialData = null, onSubmit, onCancel, tiles = [] }) {
           )}
         </div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-          {orientations.map((item, idx) => (
-            <div
-              key={idx}
-              className="bg-[#FAF7F4] rounded-2xl p-4 border border-[#F0E8DF] relative group"
-            >
-              <div className="aspect-square rounded-xl overflow-hidden bg-white border border-[#F0E8DF] mb-3 relative">
-                <img
-                  src={item.previewUrl || 'https://via.placeholder.com/300?text=No+Image'}
-                  alt={item.name}
-                  className="w-full h-full object-cover"
-                />
-                <label className="absolute bottom-2 right-2 bg-[#3D3229]/80 hover:bg-[#C2784A] text-white p-1.5 rounded-lg text-[10px] cursor-pointer backdrop-blur-xs transition-all">
-                  <i className="fa-solid fa-camera"></i>
-                  <input
-                    type="file"
-                    accept="image/jpeg,image/png"
-                    onChange={(e) => handleOrientationFileChange(idx, e)}
-                    className="hidden"
-                  />
-                </label>
-              </div>
-
-              <input
-                type="text"
-                value={item.name}
-                onChange={(e) =>
-                  handleUpdateOrientation(idx, 'name', e.target.value)
-                }
-                placeholder="Pattern Name"
-                className="w-full px-2.5 py-1.5 border border-[#F0E8DF] rounded-lg text-xs bg-white focus:outline-none focus:border-[#C2784A] font-medium"
-              />
-
-              <button
-                type="button"
-                onClick={() => handleRemoveOrientation(idx)}
-                className="absolute top-2 right-2 w-6 h-6 rounded-full bg-white text-[#C62828] border border-[#FFCCC7] hover:bg-[#FFEBEE] flex items-center justify-center text-[10px] shadow-2xs transition-all cursor-pointer"
-                title="Remove pattern"
+        {orientations.length === 0 ? (
+          <div className="text-center py-8 px-4 border-2 border-dashed border-[#F0E8DF] rounded-2xl text-[#A89885]">
+            <i className="fa-regular fa-images text-2xl mb-1.5 text-[#E8DDD4] block"></i>
+            <p className="text-xs font-medium text-[#6B5D51]">
+              No orientation patterns added (0/4).
+            </p>
+            <p className="text-[11px] mt-0.5">
+              Click &quot;Add Pattern&quot; above to attach laying-pattern previews.
+            </p>
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+            {orientations.map((item, idx) => (
+              <div
+                key={idx}
+                className="bg-[#FAF7F4] rounded-2xl p-4 border border-[#F0E8DF] relative group"
               >
-                <i className="fa-solid fa-xmark"></i>
-              </button>
-            </div>
-          ))}
-        </div>
+                <div className="aspect-square rounded-xl overflow-hidden bg-white border border-[#F0E8DF] mb-3 relative">
+                  <img
+                    src={item.previewUrl || 'https://via.placeholder.com/300?text=No+Image'}
+                    alt={item.name}
+                    className="w-full h-full object-cover"
+                  />
+                  <label className="absolute bottom-2 right-2 bg-[#3D3229]/80 hover:bg-[#C2784A] text-white p-1.5 rounded-lg text-[10px] cursor-pointer backdrop-blur-xs transition-all">
+                    <i className="fa-solid fa-camera"></i>
+                    <input
+                      type="file"
+                      accept="image/jpeg,image/png"
+                      onChange={(e) => handleOrientationFileChange(idx, e)}
+                      className="hidden"
+                    />
+                  </label>
+                </div>
+
+                <input
+                  type="text"
+                  value={item.name}
+                  onChange={(e) =>
+                    handleUpdateOrientation(idx, 'name', e.target.value)
+                  }
+                  placeholder="Pattern Name"
+                  className="w-full px-2.5 py-1.5 border border-[#F0E8DF] rounded-lg text-xs bg-white focus:outline-none focus:border-[#C2784A] font-medium"
+                />
+
+                <button
+                  type="button"
+                  onClick={() => handleRemoveOrientation(idx)}
+                  className="absolute top-2 right-2 w-6 h-6 rounded-full bg-white text-[#C62828] border border-[#FFCCC7] hover:bg-[#FFEBEE] flex items-center justify-center text-[10px] shadow-2xs transition-all cursor-pointer"
+                  title="Remove pattern"
+                >
+                  <i className="fa-solid fa-xmark"></i>
+                </button>
+              </div>
+            ))}
+          </div>
+        )}
       </div>
 
       {/* SECTION 6: INSTALLATION MOCKUPS (MIN 0, MAX 4 SCENE IMAGES) */}
