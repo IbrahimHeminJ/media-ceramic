@@ -4,20 +4,26 @@ import LanguageDetector from 'i18next-browser-languagedetector';
 import enTranslation from './locales/en.json';
 import kuTranslation from './locales/ku.json';
 import arTranslation from './locales/ar.json';
+import trTranslation from './locales/tr.json';
+import faTranslation from './locales/fa.json';
 
 const resources = {
   en: { translation: enTranslation },
   ku: { translation: kuTranslation },
   ar: { translation: arTranslation },
+  tr: { translation: trTranslation },
+  fa: { translation: faTranslation },
 };
 
 export const SUPPORTED_LANGUAGES = [
   { code: 'en', label: 'English', nativeName: 'English', dir: 'ltr', flag: 'EN' },
   { code: 'ku', label: 'Kurdish', nativeName: 'کوردی', dir: 'rtl', flag: 'کو' },
   { code: 'ar', label: 'Arabic', nativeName: 'العربية', dir: 'rtl', flag: 'ع' },
+  { code: 'tr', label: 'Turkish', nativeName: 'Türkçe', dir: 'ltr', flag: 'TR' },
+  { code: 'fa', label: 'Persian', nativeName: 'فارسی', dir: 'rtl', flag: 'فا' },
 ];
 
-const RTL_LANGUAGES = ['ar', 'ku'];
+const RTL_LANGUAGES = ['ar', 'ku', 'fa'];
 
 export const updateDocumentDirection = (lng) => {
   const isRtl = RTL_LANGUAGES.includes(lng);
@@ -30,7 +36,7 @@ export const updateDocumentDirection = (lng) => {
 const initialLng = (() => {
   try {
     const saved = localStorage.getItem('i18nextLng');
-    if (saved && ['en', 'ku', 'ar'].includes(saved)) {
+    if (saved && ['en', 'ku', 'ar', 'tr', 'fa'].includes(saved)) {
       return saved;
     }
   } catch {

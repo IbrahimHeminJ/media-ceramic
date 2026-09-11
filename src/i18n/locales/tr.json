@@ -1,0 +1,182 @@
+{
+  "common": {
+    "brandName": "Media Ceramic",
+    "companyName": "Media Ceramic Co.",
+    "tagline": "Olağanüstü ürünler, güvenilir deneyim",
+    "loading": "Yükleniyor...",
+    "error": "Bir hata oluştu",
+    "close": "Kapat",
+    "cancel": "İptal",
+    "save": "Kaydet",
+    "delete": "Sil",
+    "edit": "Düzenle",
+    "back": "Geri"
+  },
+  "nav": {
+    "brand": "Media Ceramic",
+    "home": "Ana Sayfa",
+    "tiles": "Karolar",
+    "social": "Sosyal Medya"
+  },
+  "hero": {
+    "badge": "Media Ceramic İle",
+    "titleLine1": "Olağanüstü ürünler,",
+    "titleLine2": "güvenilir bir",
+    "titleLine2Highlight": "deneyim",
+    "description": "Media Ceramic; yüksek kalite, modern tasarım ve profesyonel hizmet anlayışıyla seramik ve porselen karo ticareti ve tedarikinde öncü ve güvenilir şirketlerden biridir..",
+    "exploreCollection": "Ürünlerimizi İnceleyin",
+    "getInTouch": "İletişime Geçin"
+  },
+  "story": {
+    "badge": "Hikayemiz",
+    "title": "Ürünlerimiz modern yaşam için tasarlandı.",
+    "paragraph": "Müşterilerimizin, tasarımcıların, mimarların hem konut hem de ticari projelerinin ihtiyaçlarını en iyi şekilde karşılamak adına, sürekli olarak zengin ürün çeşitliliği ve en son tasarımları sunmak için çalışıyoruz."
+  },
+  "vision": {
+    "badge": "Vizyonumuz",
+    "title": "İnandığımız değerler.",
+    "sustainable": {
+      "title": "Kesintisiz Tedarik",
+      "description": "İhtiyacınız olan her şey bizde mevcut; arzu ettiğiniz her ürünü sizlere ulaştırmak için daima gayret gösteriyoruz."
+    },
+    "artisanal": {
+      "title": "Kraliyet Kalitesi",
+      "description": "Her karo sıkı kalite kontrollerinden geçer. Seri üretim yerine özenli üretime ve kalıcı güzelliğe inanıyoruz."
+    },
+    "minimalism": {
+      "title": "Minimalizm",
+      "description": "Tasarımlarımız temiz hatları ve özgün renkleri bir araya getirerek hem modern hem de son derece samimi ve davetkar mekanlar yaratır."
+    }
+  },
+  "trusted": {
+    "badge": "Bize Güvenenler"
+  },
+  "contact": {
+    "badge": "İletişim ve Konum",
+    "title": "Showroomumuzu ziyaret edin veya bizimle iletişime geçin.",
+    "visitShowroom": "Showroomu Ziyaret Edin",
+    "viewMap": "Haritayı Görüntüle",
+    "addressLine1": "Şoreş Caddesi (Pirmam)",
+    "addressLine2": "Erbil",
+    "emailUs": "Bize E-posta Gönderin",
+    "callUs": "Bizi Arayın",
+    "hours": "Cumartesi - Perşembe | 09:00 - 21:00",
+    "interactiveMap": "Harita",
+    "dropPin": "Konumu Haritada Görün",
+    "dropPinPrompt": "Canlı showroom haritasını açmak ve yol tarifi almak için herhangi bir yere tıklayın.",
+    "openMap": "Haritayı Aç",
+    "showroomLocation": "Şoreş Caddesi (Pirmam) - Erbil",
+    "directions": "Yol Tarifi",
+    "closeMap": "Kapat"
+  },
+  "tiles": {
+    "badge": "Koleksiyonumuz",
+    "title": "Mükemmel karonuzu bulun.",
+    "toggleFilters": "Filtreleri Değiştir",
+    "search": "Ara",
+    "searchPlaceholder": "İsme göre ara...",
+    "size": "Boyut",
+    "allSizes": "Tüm Boyutlar",
+    "color": "Renk",
+    "allColors": "Tüm Renkler",
+    "colors": {
+      "white": "Beyaz",
+      "beige": "Bej",
+      "gray": "Gri",
+      "brown": "Kahverengi",
+      "terracotta": "Terrakota"
+    },
+    "type": "Tür",
+    "allTypes": "Tüm Türler",
+    "types": {
+      "porcelain": "Porselen",
+      "ceramic": "Seramik",
+      "marble": "Mermer",
+      "terrazzo": "Terrazo"
+    },
+    "brand": "Marka",
+    "allBrands": "Tüm Markalar",
+    "resetFilters": "Filtreleri Sıfırla",
+    "filtersTitle": "Filtreler",
+    "activeFilters": "Aktif Filtreler",
+    "clearAll": "Tümünü Temizle",
+    "closeFilters": "Filtreleri Kapat",
+    "showResults": "{{count}} Karo Göster",
+    "showingResults": "{{count}} karo gösteriliyor",
+    "clearSearch": "Aramayı Temizle",
+    "noMatchTitle": "Filtrelerinizle eşleşen karo bulunamadı.",
+    "noMatchSubtitle": "Arama kriterlerinizi değiştirmeyi deneyin.",
+    "clickForDetails": "Detaylar için tıklayın",
+    "badges": {
+      "new": "Yeni",
+      "featured": "Öne Çıkan",
+      "popular": "Popüler"
+    }
+  },
+  "modal": {
+    "fullscreen": "Tam Ekran",
+    "close": "Pencereyi Kapat",
+    "downloadPdf": "Şartname Sayfasını İndir (PDF)",
+    "orientationPatterns": "Dizilim Desenleri",
+    "installationMockups": "Uygulama Örnekleri",
+    "exitFullscreen": "Tam Ekrandan Çık",
+    "clickToExpand": "Büyütmek için tıklayın",
+    "clickToViewFullscreen": "Tam ekranda görüntülemek için tıklayın",
+    "mockups": {
+      "roomInstallation": "Oda Uygulaması",
+      "bathroomMockup": "Banyo Örneği",
+      "kitchenView": "Mutfak Görünümü",
+      "closeUpDetail": "Yakın Çekim Detayı"
+    }
+  },
+  "social": {
+    "title": "Media Ceramic",
+    "handle": "Media Ceramic",
+    "bio1": "Sıcak zeminler, güzel duvarlar. Yaşam için tasarlandı. 🌿",
+    "bio2": "Birinci sınıf karolar — Portland'daki showroom.",
+    "empty": "Henüz bir sosyal medya bağlantısı yapılandırılmadı."
+  },
+  "footer": {
+    "poweredBy": "Geliştirici",
+    "copyright": "© 2026 Media Ceramic — Sıcak zeminler, güzel duvarlar. Tüm hakları saklıdır."
+  },
+  "login": {
+    "badge": "Personel Portalı",
+    "title": "Yönetim Paneli Girişi",
+    "subtitle": "Yönetim paneline erişmek için bilgilerinizi girin",
+    "username": "Kullanıcı Adı",
+    "usernamePlaceholder": "Kullanıcı adını girin (ör. admin)",
+    "password": "Şifre",
+    "passwordPlaceholder": "Şifrenizi girin",
+    "signIn": "Giriş Yap",
+    "signingIn": "Giriş yapılıyor...",
+    "errorEmpty": "Lütfen hem kullanıcı adınızı hem de şifrenizi girin.",
+    "errorInvalid": "Kullanıcı adı veya şifre hatalı. Lütfen tekrar deneyin.",
+    "forgotPassword": "Şifrenizi unuttuysanız bizimle iletişime geçin:",
+    "backToSite": "← Ana Siteye Dön"
+  },
+  "dashboard": {
+    "title": "Personel Paneli",
+    "logout": "Çıkış Yap",
+    "quickInfo": {
+      "totalTiles": "Katalogdaki Toplam Karo Sayısı",
+      "colorsAvailable": "Mevcut Renkler",
+      "suppliers": "Tedarikçiler ve Markalar",
+      "materials": "Malzemeler ve Türler",
+      "socialLinks": "Aktif Sosyal Bağlantılar"
+    },
+    "tabs": {
+      "catalog": "Karo Kataloğu",
+      "addTile": "Yeni Karo Ekle",
+      "socialLinks": "Sosyal Medya Bağlantıları"
+    },
+    "actions": {
+      "searchPlaceholder": "İsim, marka, renk veya türe göre karo arayın...",
+      "exportExcel": "Excel'e Aktar",
+      "addNew": "+ Karo Ekle",
+      "viewDetails": "Detayları Gör",
+      "edit": "Düzenle",
+      "delete": "Sil"
+    }
+  }
+}

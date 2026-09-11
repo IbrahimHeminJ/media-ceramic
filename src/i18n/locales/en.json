@@ -1,8 +1,8 @@
 {
   "common": {
-    "brandName": "TERRA TILE",
-    "companyName": "TERRA TILE CO.",
-    "tagline": "Warm floors, beautiful walls.",
+    "brandName": "Media Ceramic",
+    "companyName": "Media Ceramic Co.",
+    "tagline": "Exceptional products, trusted experience",
     "loading": "Loading...",
     "error": "An error occurred",
     "close": "Close",
@@ -13,39 +13,39 @@
     "back": "Back"
   },
   "nav": {
-    "brand": "TERRA TILE",
+    "brand": "Media Ceramic",
     "home": "Home",
     "tiles": "Tiles",
     "social": "Social"
   },
   "hero": {
-    "badge": "Premium Floor & Wall Tiling",
-    "titleLine1": "Warm floors,",
-    "titleLine2": "beautiful",
-    "titleLine2Highlight": "walls",
-    "description": "We craft timeless surfaces that bring warmth and character to every space. From natural stone to artisanal porcelain — each tile tells a story of craftsmanship.",
-    "exploreCollection": "Explore Collection",
-    "getInTouch": "Get in Touch"
+    "badge": "With Media Ceramic",
+    "titleLine1": "Exceptional products,",
+    "titleLine2": "trusted",
+    "titleLine2Highlight": "experience",
+    "description": "Media Ceramic is one of the trusted and leading companies in the field of trading and supplying ceramic and porcelain tiles, backed by high quality, modern design, and professional service..",
+    "exploreCollection": "View Our Products",
+    "getInTouch": "Contact Us"
   },
   "story": {
     "badge": "Our Story",
-    "title": "Rooted in craftsmanship, designed for modern living.",
-    "paragraph": "TERRA TILE CO. was born from a deep appreciation for natural materials and timeless design. We source the finest clays, stones, and minerals to create tiles that don't just cover surfaces — they transform them. Every piece is a marriage of tradition and innovation, crafted to bring warmth underfoot and beauty to every wall."
+    "title": "Our products are designed for modern living.",
+    "paragraph": "We strive to continuously offer a diverse range of products and the latest designs, to fulfill the needs of customers, designers, engineers, and residential and commercial projects in the best possible way."
   },
   "vision": {
     "badge": "Our Vision",
-    "title": "What we stand for.",
+    "title": "What we believe in.",
     "sustainable": {
-      "title": "Sustainable Sourcing",
-      "description": "We partner with ethical quarries and use recycled materials wherever possible to minimize our environmental footprint."
+      "title": "Continuous Supply",
+      "description": "Whatever you need is available with us; we always strive to provide everything you desire."
     },
     "artisanal": {
-      "title": "Artisanal Quality",
-      "description": "Each tile undergoes rigorous quality checks. We believe in slow production and lasting beauty over mass manufacturing."
+      "title": "Royal Quality",
+      "description": "Every tile undergoes strict quality inspections. We believe in slow production and lasting beauty over mass manufacturing."
     },
     "minimalism": {
-      "title": "Warm Minimalism",
-      "description": "Our designs embrace clean lines and warm tones — creating spaces that feel both modern and deeply inviting."
+      "title": "Minimalism",
+      "description": "Our designs embrace clean lines and distinctive colors — creating spaces that feel contemporary and deeply inviting."
     }
   },
   "trusted": {
@@ -54,18 +54,18 @@
   "contact": {
     "badge": "Contact & Location",
     "title": "Visit our showroom or get in touch.",
-    "visitShowroom": "Visit Our Showroom",
+    "visitShowroom": "Visit Showroom",
     "viewMap": "View Map",
-    "addressLine1": "127 Warm Street, Design District",
-    "addressLine2": "Portland, OR 97201",
+    "addressLine1": "Shorish Street (Pirmam)",
+    "addressLine2": "Erbil",
     "emailUs": "Email Us",
     "callUs": "Call Us",
-    "hours": "Mon – Fri: 9:00 AM – 6:00 PM | Sat: 10:00 AM – 4:00 PM",
-    "interactiveMap": "Interactive Map",
-    "dropPin": "Drop Pin & Explore Location",
+    "hours": "Saturday to Thursday | 9:00 AM to 9:00 PM",
+    "interactiveMap": "Map",
+    "dropPin": "View Location on Map",
     "dropPinPrompt": "Click anywhere to open the live showroom map and find directions.",
     "openMap": "Open Map",
-    "showroomLocation": "Portland Showroom, OR 97201",
+    "showroomLocation": "Shorish Street (Pirmam) - Erbil",
     "directions": "Directions",
     "closeMap": "Close"
   },
@@ -99,29 +99,29 @@
     "resetFilters": "Reset Filters",
     "filtersTitle": "Filters",
     "activeFilters": "Active Filters",
-    "clearAll": "Clear all",
-    "closeFilters": "Close filters",
+    "clearAll": "Clear All",
+    "closeFilters": "Close Filters",
     "showResults": "Show {{count}} Tiles",
-    "showingResults": "Showing {{count}} tiles",
-    "clearSearch": "Clear search",
+    "showingResults": "Showing {{count}} Tiles",
+    "clearSearch": "Clear Search",
     "noMatchTitle": "No tiles match your filters.",
     "noMatchSubtitle": "Try adjusting your criteria.",
     "clickForDetails": "Click for details",
     "badges": {
-      "new": "new",
-      "featured": "featured",
-      "popular": "popular"
+      "new": "New",
+      "featured": "Featured",
+      "popular": "Popular"
     }
   },
   "modal": {
     "fullscreen": "Fullscreen",
-    "close": "Close Modal",
+    "close": "Close Window",
     "downloadPdf": "Download Specification Sheet (PDF)",
     "orientationPatterns": "Orientation Patterns",
     "installationMockups": "Installation Mockups",
     "exitFullscreen": "Exit Fullscreen",
     "clickToExpand": "Click to expand",
-    "clickToViewFullscreen": "Click to view full screen",
+    "clickToViewFullscreen": "Click to view fullscreen",
     "mockups": {
       "roomInstallation": "Room Installation",
       "bathroomMockup": "Bathroom Mockup",
@@ -130,15 +130,15 @@
     }
   },
   "social": {
-    "title": "TERRA TILE CO.",
-    "handle": "@terratile.co",
+    "title": "Media Ceramic",
+    "handle": "Media Ceramic",
     "bio1": "Warm floors, beautiful walls. Crafted for living. 🌿",
-    "bio2": "Premium tiling — showroom in Portland, OR.",
+    "bio2": "Premium tiling — showroom in Portland.",
     "empty": "No social links configured."
   },
   "footer": {
     "poweredBy": "Powered By",
-    "copyright": "© 2026 TERRA TILE CO. — Warm floors, beautiful walls. All rights reserved."
+    "copyright": "© 2026 Media Ceramic — Warm floors, beautiful walls. All rights reserved."
   },
   "login": {
     "badge": "Staff Portal",
