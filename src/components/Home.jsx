@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import logoColor from '../logo/logo color.svg';
 
 export default function Home({ onNavigate }) {
   const { t } = useTranslation();
@@ -57,18 +58,14 @@ export default function Home({ onNavigate }) {
       {/* OUR STORY SECTION */}
       <div className="max-w-[1200px] mx-auto px-4 sm:px-8 py-12 sm:py-20">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8 md:gap-16 items-center">
-          {/* Tile Swatch Visual */}
-          <div className="aspect-[4/3] bg-gradient-to-br from-[#E8D5C4] via-[#F5EDE4] to-[#dcc8b0] rounded-2xl shadow-lg flex items-center justify-center p-6">
-            <div className="w-[70%] aspect-square bg-white rounded-xl p-2 grid grid-cols-3 grid-rows-3 gap-1 shadow-md">
-              <span className="rounded bg-[#d4b896]"></span>
-              <span className="rounded bg-[#c9a882]"></span>
-              <span className="rounded bg-[#d4b896]"></span>
-              <span className="rounded bg-[#bf9e78]"></span>
-              <span className="rounded bg-[#c9a882]"></span>
-              <span className="rounded bg-[#bf9e78]"></span>
-              <span className="rounded bg-[#d4b896]"></span>
-              <span className="rounded bg-[#bf9e78]"></span>
-              <span className="rounded bg-[#d4b896]"></span>
+          {/* Brand Logo Visual */}
+          <div className="aspect-[4/3] bg-gradient-to-br from-[#E8D5C4] via-[#F5EDE4] to-[#dcc8b0] rounded-2xl shadow-lg flex items-center justify-center p-6 sm:p-10">
+            <div className="w-[85%] max-w-[380px] bg-white/90 backdrop-blur-sm rounded-2xl p-8 sm:p-10 shadow-md flex items-center justify-center transition-transform duration-300 hover:scale-[1.02]">
+              <img
+                src={logoColor}
+                alt="Media Ceramic"
+                className="w-full h-auto max-h-[140px] object-contain"
+              />
             </div>
           </div>
 
@@ -143,7 +140,7 @@ export default function Home({ onNavigate }) {
           {t('trusted.badge', 'Trusted By')}
         </span>
         <div className="flex flex-wrap items-center justify-center gap-8 sm:gap-12">
-          {['HAVEN HOMES', 'STUDIO OAK', 'THE DESIGN CO.', 'URBAN NEST', 'CRAFT & CLAY', 'MODERN LIVING'].map((brand, i) => (
+          {['Urkbay', 'test'].map((brand, i) => (
             <span
               key={i}
               className="font-serif text-lg sm:text-xl font-semibold text-[#A89885] grayscale opacity-50 hover:opacity-90 hover:grayscale-0 hover:text-[#3D3229] transition-all cursor-default tracking-wide"
