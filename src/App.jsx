@@ -14,6 +14,10 @@ export default function App() {
   const [currentPage, setCurrentPage] = useState('home');
   const [selectedTile, setSelectedTile] = useState(null);
 
+  // Tile id parsed from a deep-linked URL (e.g. #tiles/13), resolved against `tiles`
+  // once the catalog has loaded — see the effect below.
+  const [pendingTileId, setPendingTileId] = useState(null);
+
   // Central tiles collection state (supports CRUD across Catalog & Dashboard)
   const [tiles, setTiles] = useState([]);
 
@@ -49,6 +53,7 @@ export default function App() {
   /**
    * Evaluates the current URL route (pathname or hash).
    * Ensures /login and /dashboard paths are properly resolved.
+   * A tiles route may carry a deep-linked tile id, e.g. `#tiles/13`.
    */
   const resolveRoute = useCallback(() => {
     const pathname = window.location.pathname.toLowerCase().replace(/\/+$/, '');
@@ -56,26 +61,32 @@ export default function App() {
 
     // Check login path (via /login or #/login or #login)
     if (pathname === '/login' || hash === 'login' || hash === '/login') {
-      return 'login';
+      return { page: 'login' };
     }
 
     // Check dashboard path (protected)
     if (pathname === '/dashboard' || hash === 'dashboard' || hash === '/dashboard') {
-      return 'dashboard';
+      return { page: 'dashboard' };
+    }
+
+    // Deep-linked tile detail, e.g. #tiles/13
+    const tileDetailMatch = hash.match(/^tiles\/(\d+)$/);
+    if (tileDetailMatch) {
+      return { page: 'tiles', tileId: Number(tileDetailMatch[1]) };
     }
 
     // Public collection / social / home routes
     if (hash === 'tiles' || hash === 'social' || hash === 'home') {
-      return hash;
+      return { page: hash };
     }
 
-    return 'home';
+    return { page: 'home' };
   }, []);
 
   // Synchronize route changes from browser navigation (back/forward/hash/url load)
   useEffect(() => {
     const handleLocationChange = () => {
-      const targetPage = resolveRoute();
+      const { page: targetPage, tileId } = resolveRoute();
 
       // Route protection for Dashboard: redirect unauthenticated visits to login
       if (targetPage === 'dashboard' && !currentUser) {
@@ -87,6 +98,7 @@ export default function App() {
       }
 
       setCurrentPage(targetPage);
+      setPendingTileId(tileId ?? null);
     };
 
     window.addEventListener('hashchange', handleLocationChange);
@@ -100,11 +112,18 @@ export default function App() {
     };
   }, [resolveRoute, currentUser]);
 
+  // The tile to show in the detail modal: a directly-clicked tile takes priority,
+  // otherwise fall back to resolving a deep-linked id (e.g. from a shared/refreshed
+  // #tiles/13 URL) against the catalog once it has loaded.
+  const modalTile =
+    selectedTile ?? (pendingTileId != null ? tiles.find((t) => t.id === pendingTileId) ?? null : null);
+
   /**
    * Navigation handler for internal links and page transitions.
    */
   const navigateTo = (page) => {
     setSelectedTile(null);
+    setPendingTileId(null);
     window.scrollTo({ top: 0, behavior: 'smooth' });
 
     if (page === 'login') {
@@ -149,6 +168,7 @@ export default function App() {
       // Ignore storage errors
     }
     setSelectedTile(null);
+    setPendingTileId(null);
     window.scrollTo({ top: 0, behavior: 'smooth' });
     setCurrentPage('dashboard');
     window.history.pushState({}, '', '/dashboard');
@@ -165,6 +185,36 @@ export default function App() {
       // Ignore storage errors
     }
     navigateTo('login');
+  };
+
+  /**
+   * Opens a tile's detail modal from the public catalog and pushes a shareable,
+   * deep-linkable URL (#tiles/{id}) so copying/reloading it reopens the same tile.
+   */
+  const handleSelectTile = (tile) => {
+    setSelectedTile(tile);
+    const hashUrl = `#tiles/${tile.id}`;
+    if (window.location.pathname !== '/' && window.location.pathname !== '') {
+      window.history.pushState({}, '', `/${hashUrl}`);
+    } else {
+      window.history.pushState({}, '', hashUrl);
+    }
+  };
+
+  /**
+   * Closes the tile detail modal. Only reverts the URL back to the plain #tiles
+   * route when actually on the public catalog page — this modal is also reused by
+   * the Dashboard's "View Details" button, where the URL shouldn't change.
+   */
+  const closeTileModal = () => {
+    setSelectedTile(null);
+    setPendingTileId(null);
+    if (currentPage !== 'tiles') return;
+    if (window.location.pathname !== '/' && window.location.pathname !== '') {
+      window.history.pushState({}, '', '/#tiles');
+    } else {
+      window.history.pushState({}, '', '#tiles');
+    }
   };
 
   /**
@@ -213,7 +263,7 @@ export default function App() {
         {currentPage === 'tiles' && (
           <Tiles
             tiles={tiles}
-            onSelectTile={(tile) => setSelectedTile(tile)}
+            onSelectTile={handleSelectTile}
           />
         )}
 
@@ -248,10 +298,10 @@ export default function App() {
       </main>
 
       {/* Tile Detail Modal */}
-      {selectedTile && (
+      {modalTile && (
         <TileModal
-          tile={selectedTile}
-          onClose={() => setSelectedTile(null)}
+          tile={modalTile}
+          onClose={closeTileModal}
         />
       )}
 

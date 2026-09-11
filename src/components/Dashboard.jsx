@@ -145,8 +145,8 @@ export default function Dashboard({
     const rows = tiles.map((tile) => {
       const orientationsList = Array.isArray(tile.orientations)
         ? tile.orientations
-            .map((o) => (typeof o === 'object' ? o.name : o))
-            .join('; ')
+          .map((o) => (typeof o === 'object' ? o.name : o))
+          .join('; ')
         : '';
       const orientationsCount = Array.isArray(tile.orientations)
         ? tile.orientations.length
@@ -367,11 +367,10 @@ export default function Dashboard({
           {/* Tab 1: List */}
           <button
             onClick={() => setActiveTab('list')}
-            className={`px-4 sm:px-5 py-3 font-semibold text-xs sm:text-sm rounded-t-2xl transition-all cursor-pointer flex items-center gap-2 border-b-2 ${
-              activeTab === 'list'
+            className={`px-4 sm:px-5 py-3 font-semibold text-xs sm:text-sm rounded-t-2xl transition-all cursor-pointer flex items-center gap-2 border-b-2 ${activeTab === 'list'
                 ? 'bg-white text-[#C2784A] border-[#C2784A] shadow-xs'
                 : 'text-[#6B5D51] hover:text-[#3D3229] border-transparent hover:bg-white/50'
-            }`}
+              }`}
           >
             <i className="fa-solid fa-list-check"></i>
             <span>Tile Collection List</span>
@@ -383,11 +382,10 @@ export default function Dashboard({
           {/* Tab 2: Add Tile */}
           <button
             onClick={() => setActiveTab('add')}
-            className={`px-4 sm:px-5 py-3 font-semibold text-xs sm:text-sm rounded-t-2xl transition-all cursor-pointer flex items-center gap-2 border-b-2 ${
-              activeTab === 'add'
+            className={`px-4 sm:px-5 py-3 font-semibold text-xs sm:text-sm rounded-t-2xl transition-all cursor-pointer flex items-center gap-2 border-b-2 ${activeTab === 'add'
                 ? 'bg-white text-[#C2784A] border-[#C2784A] shadow-xs'
                 : 'text-[#6B5D51] hover:text-[#3D3229] border-transparent hover:bg-white/50'
-            }`}
+              }`}
           >
             <i className="fa-solid fa-plus-circle"></i>
             <span>Add New Tile</span>
@@ -396,11 +394,10 @@ export default function Dashboard({
           {/* Tab 3: Social Links */}
           <button
             onClick={() => setActiveTab('social')}
-            className={`px-4 sm:px-5 py-3 font-semibold text-xs sm:text-sm rounded-t-2xl transition-all cursor-pointer flex items-center gap-2 border-b-2 ${
-              activeTab === 'social'
+            className={`px-4 sm:px-5 py-3 font-semibold text-xs sm:text-sm rounded-t-2xl transition-all cursor-pointer flex items-center gap-2 border-b-2 ${activeTab === 'social'
                 ? 'bg-white text-[#C2784A] border-[#C2784A] shadow-xs'
                 : 'text-[#6B5D51] hover:text-[#3D3229] border-transparent hover:bg-white/50'
-            }`}
+              }`}
           >
             <i className="fa-solid fa-share-nodes"></i>
             <span>Social Links</span>
@@ -501,13 +498,12 @@ export default function Dashboard({
                                 </span>
                                 {tile.badge && (
                                   <span
-                                    className={`text-[9px] font-bold uppercase px-2 py-0.5 rounded-full ${
-                                      tile.badge === 'new'
+                                    className={`text-[9px] font-bold uppercase px-2 py-0.5 rounded-full ${tile.badge === 'new'
                                         ? 'bg-[#E8F5E9] text-[#2E7D32]'
                                         : tile.badge === 'featured'
-                                        ? 'bg-[#FFF8E1] text-[#F57F17]'
-                                        : 'bg-[#FFEBEE] text-[#C62828]'
-                                    }`}
+                                          ? 'bg-[#FFF8E1] text-[#F57F17]'
+                                          : 'bg-[#FFEBEE] text-[#C62828]'
+                                      }`}
                                   >
                                     {tile.badge}
                                   </span>
@@ -612,6 +608,7 @@ export default function Dashboard({
         {activeTab === 'add' && (
           <div className="p-6 sm:p-10">
             <TileForm
+              tiles={tiles}
               mode="create"
               onSubmit={async (formData, tileName) => {
                 try {
@@ -651,6 +648,7 @@ export default function Dashboard({
       {editingTile && (
         <EditTileModal
           tile={editingTile}
+          tiles={tiles}
           onSave={async (formData) => {
             try {
               const updated = await onUpdateTile(editingTile.id, formData);
@@ -881,11 +879,10 @@ function SocialLinksManager({ socialLinks = [], onAddLink, onDeleteLink }) {
                       setSelectedIcon(preset);
                       setCustomIconClass('');
                     }}
-                    className={`flex flex-col items-center justify-center p-3 rounded-2xl border-2 transition-all cursor-pointer ${
-                      isSelected
+                    className={`flex flex-col items-center justify-center p-3 rounded-2xl border-2 transition-all cursor-pointer ${isSelected
                         ? 'bg-white border-[#C2784A] shadow-sm scale-105'
                         : 'bg-white/60 border-[#F0E8DF] hover:bg-white hover:border-[#D4956A]'
-                    }`}
+                      }`}
                   >
                     <i className={`${preset.icon} ${preset.color} text-xl mb-1`}></i>
                     <span className="text-[10px] font-semibold text-[#6B5D51] truncate max-w-full">
@@ -1050,25 +1047,34 @@ const DEFAULT_MOCKUP_LABELS = [
  * image uploads, PDF brochure, and (create mode only) up to 4 orientations
  * and up to 4 installation mockups (minimum 0, maximum 4).
  */
-function TileForm({ initialData = null, onSubmit, onCancel }) {
+function TileForm({ initialData = null, onSubmit, onCancel, tiles = [] }) {
   const mode = initialData ? 'edit' : 'create';
 
+  const mergeUnique = (defaults, dynamic) => [...new Set([...defaults, ...dynamic])].sort();
+
+  const brandOptions = mergeUnique([], tiles.map(t => t.brand).filter(Boolean));
+  const sizeOptions = mergeUnique(['60x60', '30x60', '30x30', '20x120'], tiles.map(t => t.size).filter(Boolean));
+  const colorOptions = mergeUnique(['white', 'beige', 'gray', 'brown', 'terracotta'], tiles.map(t => t.color).filter(Boolean));
+  const typeOptions = mergeUnique(['porcelain', 'ceramic', 'marble', 'terrazzo'], tiles.map(t => t.type).filter(Boolean));
+  const thicknessOptions = mergeUnique(['9mm', '10mm', '12mm'], tiles.map(t => t.thickness).filter(Boolean));
+  const finishOptions = mergeUnique(['Matte', 'Honed', 'Polished'], tiles.map(t => t.finish).filter(Boolean));
+  const slipResistanceOptions = mergeUnique(['R9', 'R10', 'R11', 'R12'], tiles.map(t => t.slipResistance).filter(Boolean));
+  const usageOptions = mergeUnique(['Floor & Wall', 'Floor Only', 'Wall Only'], tiles.map(t => t.usage).filter(Boolean));
+
   const [name, setName] = useState(initialData?.name || '');
-  const [brand, setBrand] = useState(initialData?.brand || 'Marazzi');
-  const [customBrand, setCustomBrand] = useState('');
-  const [size, setSize] = useState(initialData?.size || '60x60');
-  const [customSize, setCustomSize] = useState('');
-  const [color, setColor] = useState(initialData?.color || 'white');
-  const [type, setType] = useState(initialData?.type || 'porcelain');
+  const [brand, setBrand] = useState(initialData?.brand || '');
+  const [size, setSize] = useState(initialData?.size || '');
+  const [color, setColor] = useState(initialData?.color || '');
+  const [type, setType] = useState(initialData?.type || '');
   const [badge, setBadge] = useState(initialData?.badge || 'none');
 
   // Technical Specs
-  const [thickness, setThickness] = useState(initialData?.thickness || '9mm');
-  const [finish, setFinish] = useState(initialData?.finish || 'Matte');
+  const [thickness, setThickness] = useState(initialData?.thickness || '');
+  const [finish, setFinish] = useState(initialData?.finish || '');
   const [slipResistance, setSlipResistance] = useState(
-    initialData?.slipResistance || 'R10'
+    initialData?.slipResistance || ''
   );
-  const [usage, setUsage] = useState(initialData?.usage || 'Floor & Wall');
+  const [usage, setUsage] = useState(initialData?.usage || '');
   const [description, setDescription] = useState(initialData?.description || '');
 
   // Media — real File objects for upload, plus a preview URL for display
@@ -1084,15 +1090,15 @@ function TileForm({ initialData = null, onSubmit, onCancel }) {
   const [orientations, setOrientations] = useState(() =>
     initialData?.orientations?.length
       ? initialData.orientations.map((o) => ({
-          id: o.id,
-          name: o.name,
-          imageFile: null,
-          previewUrl: resolveAssetUrl(o.imagePath),
-        }))
+        id: o.id,
+        name: o.name,
+        imageFile: null,
+        previewUrl: resolveAssetUrl(o.imagePath),
+      }))
       : [
-          { id: null, name: 'Straight Lay', imageFile: null, previewUrl: '' },
-          { id: null, name: 'Diagonal 45°', imageFile: null, previewUrl: '' },
-        ]
+        { id: null, name: 'Straight Lay', imageFile: null, previewUrl: '' },
+        { id: null, name: 'Diagonal 45°', imageFile: null, previewUrl: '' },
+      ]
   );
 
   // Up to 4 installation mockups (minimum 0, maximum 4). In edit mode, seeded from
@@ -1100,11 +1106,11 @@ function TileForm({ initialData = null, onSubmit, onCancel }) {
   const [mockups, setMockups] = useState(() =>
     initialData?.mockups?.length
       ? initialData.mockups.map((m) => ({
-          id: m.id,
-          label: m.label,
-          imageFile: null,
-          previewUrl: resolveAssetUrl(m.imagePath),
-        }))
+        id: m.id,
+        label: m.label,
+        imageFile: null,
+        previewUrl: resolveAssetUrl(m.imagePath),
+      }))
       : []
   );
 
@@ -1221,18 +1227,14 @@ function TileForm({ initialData = null, onSubmit, onCancel }) {
       return;
     }
 
-    const finalBrand = brand === 'other' ? customBrand.trim() || 'Terra Tile Co.' : brand;
-    const finalSize = size === 'other' ? customSize.trim() || '60x60' : size;
+    const finalBrand = brand.trim() || 'Terra Tile Co.';
+    const finalSize = size.trim() || '60x60';
 
     const formData = new FormData();
 
     if (mode === 'create') {
       if (!imageFile) {
         setFormError('Please upload a main tile image.');
-        return;
-      }
-      if (!pdfFile) {
-        setFormError('Please upload a specification PDF.');
         return;
       }
 
@@ -1248,7 +1250,7 @@ function TileForm({ initialData = null, onSubmit, onCancel }) {
       formData.append('slipResistance', slipResistance.trim());
       formData.append('usage', usage.trim());
       formData.append('image', imageFile);
-      formData.append('pdf', pdfFile);
+      if (pdfFile) formData.append('pdf', pdfFile);
     } else {
       const appendIfChanged = (key, currentValue, originalValue) => {
         if (currentValue !== (originalValue || '')) formData.append(key, currentValue);
@@ -1390,26 +1392,18 @@ function TileForm({ initialData = null, onSubmit, onCancel }) {
             <label className="text-[11px] font-bold uppercase tracking-wider text-[#A89885] block mb-1.5">
               Brand / Manufacturer *
             </label>
-            <select
+            <input
+              type="text"
+              list="brand-options"
               value={brand}
               onChange={(e) => setBrand(e.target.value)}
+              placeholder="e.g. Marazzi"
+              required
               className="w-full px-4 py-2.5 border-2 border-[#F0E8DF] rounded-xl text-sm bg-[#FAF7F4] focus:outline-none focus:border-[#C2784A] text-[#3D3229]"
-            >
-              <option value="Marazzi">Marazzi</option>
-              <option value="Terra Tile Co.">Terra Tile Co.</option>
-              <option value="Florim">Florim</option>
-              <option value="Casalgrande">Casalgrande</option>
-              <option value="other">Custom Brand...</option>
-            </select>
-            {brand === 'other' && (
-              <input
-                type="text"
-                placeholder="Enter custom brand"
-                value={customBrand}
-                onChange={(e) => setCustomBrand(e.target.value)}
-                className="mt-2 w-full px-4 py-2 border-2 border-[#F0E8DF] rounded-xl text-sm bg-[#FAF7F4]"
-              />
-            )}
+            />
+            <datalist id="brand-options">
+              {brandOptions.map((opt, i) => <option key={`brand-${i}`} value={opt} />)}
+            </datalist>
           </div>
 
           {/* Size */}
@@ -1417,26 +1411,18 @@ function TileForm({ initialData = null, onSubmit, onCancel }) {
             <label className="text-[11px] font-bold uppercase tracking-wider text-[#A89885] block mb-1.5">
               Size Format *
             </label>
-            <select
+            <input
+              type="text"
+              list="size-options"
               value={size}
               onChange={(e) => setSize(e.target.value)}
+              placeholder="e.g. 60x60"
+              required
               className="w-full px-4 py-2.5 border-2 border-[#F0E8DF] rounded-xl text-sm bg-[#FAF7F4] focus:outline-none focus:border-[#C2784A] text-[#3D3229]"
-            >
-              <option value="60x60">60x60 cm</option>
-              <option value="30x60">30x60 cm</option>
-              <option value="30x30">30x30 cm</option>
-              <option value="20x120">20x120 cm</option>
-              <option value="other">Custom size...</option>
-            </select>
-            {size === 'other' && (
-              <input
-                type="text"
-                placeholder="e.g. 45x90"
-                value={customSize}
-                onChange={(e) => setCustomSize(e.target.value)}
-                className="mt-2 w-full px-4 py-2 border-2 border-[#F0E8DF] rounded-xl text-sm bg-[#FAF7F4]"
-              />
-            )}
+            />
+            <datalist id="size-options">
+              {sizeOptions.map((opt, i) => <option key={`size-${i}`} value={opt} />)}
+            </datalist>
           </div>
 
           {/* Color Category */}
@@ -1444,17 +1430,18 @@ function TileForm({ initialData = null, onSubmit, onCancel }) {
             <label className="text-[11px] font-bold uppercase tracking-wider text-[#A89885] block mb-1.5">
               Color Palette *
             </label>
-            <select
+            <input
+              type="text"
+              list="color-options"
               value={color}
               onChange={(e) => setColor(e.target.value)}
+              placeholder="e.g. White"
+              required
               className="w-full px-4 py-2.5 border-2 border-[#F0E8DF] rounded-xl text-sm bg-[#FAF7F4] focus:outline-none focus:border-[#C2784A] text-[#3D3229]"
-            >
-              <option value="white">White</option>
-              <option value="beige">Beige</option>
-              <option value="gray">Gray</option>
-              <option value="brown">Brown</option>
-              <option value="terracotta">Terracotta</option>
-            </select>
+            />
+            <datalist id="color-options">
+              {colorOptions.map((opt, i) => <option key={`color-${i}`} value={opt} />)}
+            </datalist>
           </div>
 
           {/* Material Type */}
@@ -1462,16 +1449,18 @@ function TileForm({ initialData = null, onSubmit, onCancel }) {
             <label className="text-[11px] font-bold uppercase tracking-wider text-[#A89885] block mb-1.5">
               Material Type *
             </label>
-            <select
+            <input
+              type="text"
+              list="type-options"
               value={type}
               onChange={(e) => setType(e.target.value)}
+              placeholder="e.g. Porcelain"
+              required
               className="w-full px-4 py-2.5 border-2 border-[#F0E8DF] rounded-xl text-sm bg-[#FAF7F4] focus:outline-none focus:border-[#C2784A] text-[#3D3229]"
-            >
-              <option value="porcelain">Porcelain</option>
-              <option value="ceramic">Ceramic</option>
-              <option value="marble">Marble</option>
-              <option value="terrazzo">Terrazzo</option>
-            </select>
+            />
+            <datalist id="type-options">
+              {typeOptions.map((opt, i) => <option key={`type-${i}`} value={opt} />)}
+            </datalist>
           </div>
 
           {/* Badge */}
@@ -1507,11 +1496,15 @@ function TileForm({ initialData = null, onSubmit, onCancel }) {
             </label>
             <input
               type="text"
+              list="thickness-options"
               value={thickness}
               onChange={(e) => setThickness(e.target.value)}
               placeholder="e.g. 9mm or 10mm"
               className="w-full px-4 py-2.5 border-2 border-[#F0E8DF] rounded-xl text-sm bg-[#FAF7F4] focus:outline-none focus:border-[#C2784A] text-[#3D3229]"
             />
+            <datalist id="thickness-options">
+              {thicknessOptions.map((opt, i) => <option key={`thickness-${i}`} value={opt} />)}
+            </datalist>
           </div>
 
           {/* Finish */}
@@ -1521,11 +1514,15 @@ function TileForm({ initialData = null, onSubmit, onCancel }) {
             </label>
             <input
               type="text"
+              list="finish-options"
               value={finish}
               onChange={(e) => setFinish(e.target.value)}
               placeholder="e.g. Matte, Honed, Polished"
               className="w-full px-4 py-2.5 border-2 border-[#F0E8DF] rounded-xl text-sm bg-[#FAF7F4] focus:outline-none focus:border-[#C2784A] text-[#3D3229]"
             />
+            <datalist id="finish-options">
+              {finishOptions.map((opt, i) => <option key={`finish-${i}`} value={opt} />)}
+            </datalist>
           </div>
 
           {/* Slip Resistance */}
@@ -1535,11 +1532,15 @@ function TileForm({ initialData = null, onSubmit, onCancel }) {
             </label>
             <input
               type="text"
+              list="slip-resistance-options"
               value={slipResistance}
               onChange={(e) => setSlipResistance(e.target.value)}
               placeholder="e.g. R9, R10, R11, R12"
               className="w-full px-4 py-2.5 border-2 border-[#F0E8DF] rounded-xl text-sm bg-[#FAF7F4] focus:outline-none focus:border-[#C2784A] text-[#3D3229]"
             />
+            <datalist id="slip-resistance-options">
+              {slipResistanceOptions.map((opt, i) => <option key={`slip-${i}`} value={opt} />)}
+            </datalist>
           </div>
 
           {/* Usage */}
@@ -1549,11 +1550,15 @@ function TileForm({ initialData = null, onSubmit, onCancel }) {
             </label>
             <input
               type="text"
+              list="usage-options"
               value={usage}
               onChange={(e) => setUsage(e.target.value)}
               placeholder="e.g. Floor & Wall"
               className="w-full px-4 py-2.5 border-2 border-[#F0E8DF] rounded-xl text-sm bg-[#FAF7F4] focus:outline-none focus:border-[#C2784A] text-[#3D3229]"
             />
+            <datalist id="usage-options">
+              {usageOptions.map((opt, i) => <option key={`usage-${i}`} value={opt} />)}
+            </datalist>
           </div>
         </div>
       </div>
@@ -1616,12 +1621,12 @@ function TileForm({ initialData = null, onSubmit, onCancel }) {
           {/* Specification PDF Sheet */}
           <div className="p-5 bg-[#FAF7F4] rounded-2xl border border-[#F0E8DF]">
             <label className="text-xs font-bold uppercase tracking-wider text-[#3D3229] block mb-2">
-              Brochure / Specification Sheet (PDF) {mode === 'create' && '*'}
+              Brochure / Specification Sheet (PDF)
             </label>
             <p className="text-xs text-[#6B5D51] mb-2">
               {mode === 'edit'
                 ? 'Upload a new PDF to replace the existing one.'
-                : 'PDF document for the technical download button.'}
+                : 'Optional — PDF document for the technical download button.'}
             </p>
             <div className="space-y-2">
               {pdfFile && (
@@ -1843,7 +1848,7 @@ function TileForm({ initialData = null, onSubmit, onCancel }) {
 // ===========================================================================
 // SUB-COMPONENT: EDIT TILE MODAL
 // ===========================================================================
-function EditTileModal({ tile, onSave, onClose }) {
+function EditTileModal({ tile, onSave, onClose, tiles = [] }) {
   return (
     <div
       onClick={onClose}
@@ -1863,6 +1868,7 @@ function EditTileModal({ tile, onSave, onClose }) {
 
         <TileForm
           initialData={tile}
+          tiles={tiles}
           onSubmit={onSave}
           onCancel={onClose}
         />
