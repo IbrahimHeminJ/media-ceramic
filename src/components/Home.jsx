@@ -156,7 +156,7 @@ export default function Home({ onNavigate }) {
           {t('projects.badge', 'Projects')}
         </span>
         <div className="flex flex-wrap items-center justify-center gap-8 sm:gap-12">
-          {["Davos city", "Spanish village 2", "Camera building", "Mnara showroom", "Edition Tower"].map((brand, i) => (
+          {["Davos city", "Spanish village 2", "Camera Building of Erbil Traffic Police", "Mnara showroom", "Edition Tower"].map((brand, i) => (
             <span
               key={i}
               className="font-serif text-2xl sm:text-xl font-semibold text-[#A89885] grayscale opacity-50 hover:opacity-90 hover:grayscale-0 hover:text-[#3D3229] transition-all cursor-default tracking-wide"
@@ -204,7 +204,7 @@ export default function Home({ onNavigate }) {
               </div>
             </button>
 
-            <div className="flex items-start gap-4 p-3 -m-3">
+            {/* <div className="flex items-start gap-4 p-3 -m-3">
               <div className="w-11 h-11 bg-[#F5EDE4] rounded-full flex items-center justify-center text-[#A85D32] shrink-0 text-base">
                 <i className="fa-solid fa-envelope"></i>
               </div>
@@ -217,7 +217,7 @@ export default function Home({ onNavigate }) {
                   hello@terratile.co
                 </a>
               </div>
-            </div>
+            </div> */}
 
             <div className="flex items-start gap-4 p-3 -m-3">
               <div className="w-11 h-11 bg-[#F5EDE4] rounded-full flex items-center justify-center text-[#A85D32] shrink-0 text-base">
@@ -229,7 +229,7 @@ export default function Home({ onNavigate }) {
                   href="tel:+15035550147"
                   className="text-sm text-[#6B5D51] hover:text-[#A85D32] transition-colors mt-0.5 block"
                 >
-                  +1 (503) 555-0147
+                  +964 750 460 1000
                 </a>
               </div>
             </div>
