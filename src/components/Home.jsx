@@ -140,7 +140,7 @@ export default function Home({ onNavigate }) {
           {t('trusted.badge', 'Trusted By')}
         </span>
         <div className="flex flex-wrap items-center justify-center gap-8 sm:gap-12">
-          {['Urkbay', 'test'].map((brand, i) => (
+          {['Yurtbay Seramik'].map((brand, i) => (
             <span
               key={i}
               className="font-serif text-lg sm:text-xl font-semibold text-[#A89885] grayscale opacity-50 hover:opacity-90 hover:grayscale-0 hover:text-[#3D3229] transition-all cursor-default tracking-wide"
