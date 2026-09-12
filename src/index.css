@@ -152,9 +152,27 @@ html[lang="ku"] .font-serif {
   font-family: 'Vazirmatn', 'Noto Sans Arabic', sans-serif !important;
 }
 
-/* RTL Typography Optimization: Avoid breaking cursive Arabic & Kurdish ligatures */
+/* Persian (fa) -> Vazirmatn */
+html[lang="fa"] {
+  --font-sans: 'Vazirmatn', 'Noto Sans Arabic', sans-serif;
+  --font-serif: 'Vazirmatn', 'Noto Sans Arabic', sans-serif;
+  font-family: 'Vazirmatn', 'Noto Sans Arabic', sans-serif;
+}
+
+html[lang="fa"] body,
+html[lang="fa"] button,
+html[lang="fa"] input,
+html[lang="fa"] textarea,
+html[lang="fa"] select,
+html[lang="fa"] .font-sans,
+html[lang="fa"] .font-serif {
+  font-family: 'Vazirmatn', 'Noto Sans Arabic', sans-serif !important;
+}
+
+/* RTL Typography Optimization: Avoid breaking cursive Arabic & Kurdish & Persian ligatures */
 html[dir="rtl"] [class*="tracking-"],
 html[lang="ar"] [class*="tracking-"],
-html[lang="ku"] [class*="tracking-"] {
+html[lang="ku"] [class*="tracking-"],
+html[lang="fa"] [class*="tracking-"] {
   letter-spacing: 0 !important;
 }

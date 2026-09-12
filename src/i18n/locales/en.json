@@ -51,6 +51,9 @@
   "trusted": {
     "badge": "Trusted By"
   },
+  "projects":{
+    "badge": "Projects"
+  },
   "contact": {
     "badge": "Contact & Location",
     "title": "Visit our showroom or get in touch.",

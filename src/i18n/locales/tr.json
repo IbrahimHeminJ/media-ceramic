@@ -51,6 +51,9 @@
   "trusted": {
     "badge": "Bize Güvenenler"
   },
+  "projects": {
+    "badge": "Projeler"
+  },
   "contact": {
     "badge": "İletişim ve Konum",
     "title": "Showroomumuzu ziyaret edin veya bizimle iletişime geçin.",
