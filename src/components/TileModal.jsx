@@ -2,6 +2,8 @@ import React, { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { resolveAssetUrl } from '../api/client';
 
+const WHATSAPP_NUMBER = '9647504601000';
+
 /**
  * TileModal Component
  *
@@ -64,6 +66,13 @@ export default function TileModal({ tile, onClose }) {
 
   // Mockups list
   const mockupsList = Array.isArray(tile.mockups) ? tile.mockups : [];
+
+  // Shareable deep link for this tile, built from the id directly (rather than
+  // window.location.href) so it's correct even when the modal is opened from the
+  // admin Dashboard, which doesn't rewrite the URL bar.
+  const tileUrl = `${window.location.origin}/#tiles/${tile.id}`;
+  const whatsappMessage = `${tileUrl}\n${t('modal.whatsappMessage', 'Hello, can I get more information about this?')}`;
+  const whatsappHref = `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(whatsappMessage)}`;
 
   return (
     <>
@@ -286,6 +295,22 @@ export default function TileModal({ tile, onClose }) {
           </div>
         </div>
       </div>
+
+      {/* FLOATING WHATSAPP BUTTON: Fixed to the viewport's bottom-right corner (never
+          scrolls with the modal's internal content) while the tile modal is open.
+          Hidden during the fullscreen lightbox, which is a distraction-free view. */}
+      {!fullscreenImage && (
+        <a
+          href={whatsappHref}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="fixed bottom-5 right-5 sm:bottom-6 sm:right-6 z-[210] inline-flex items-center gap-2.5 pl-4 pr-5 py-3 rounded-full bg-[#25D366] hover:bg-[#20BD5A] text-white font-semibold text-sm shadow-lg hover:shadow-xl hover:-translate-y-0.5 transition-all cursor-pointer animate-fade-slide-in"
+          title={t('modal.messageUs', 'Message us')}
+        >
+          <i className="fa-brands fa-whatsapp text-2xl"></i>
+          <span>{t('modal.messageUs', 'Message us')}</span>
+        </a>
+      )}
 
       {/* FULLSCREEN LIGHTBOX IMAGE VIEWER (For Main Tile, Mockups & Orientations) */}
       {fullscreenImage && (
