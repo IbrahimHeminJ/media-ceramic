@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import logoColor from '../logo/logo color.svg';
+import HeroSlideshow from './HeroSlideshow';
 
 export default function Home({ onNavigate }) {
   const { t } = useTranslation();
@@ -15,43 +16,38 @@ export default function Home({ onNavigate }) {
 
   return (
     <section className="animate-fade-slide-in flex-1 pb-16 sm:pb-24">
-      {/* HERO SECTION */}
-      <div className="relative overflow-hidden py-12 sm:py-20 text-center px-4 max-w-[860px] mx-auto">
-        {/* Radial Background Glow */}
-        <div
-          className="absolute -top-32 left-1/2 -translate-x-1/2 w-[600px] h-[600px] rounded-full pointer-events-none opacity-80"
-          style={{
-            background:
-              'radial-gradient(circle, rgba(194,120,74,0.12) 0%, transparent 70%)',
-          }}
-        />
+      {/* HERO SECTION: full-bleed auto-sliding background behind the slogan */}
+      <div className="relative overflow-hidden min-h-[480px] sm:min-h-[560px] lg:min-h-[620px] flex items-center">
+        <HeroSlideshow />
 
-        <span className="inline-block px-4 py-1.5 bg-[#E8D5C4] text-[#A85D32] rounded-full text-xs font-semibold uppercase tracking-wider mb-6">
-          {t('hero.badge', 'Premium Floor & Wall Tiling')}
-        </span>
+        <div className="relative z-10 w-full py-16 sm:py-20 text-center px-4 max-w-[860px] mx-auto">
+          <span className="inline-block px-4 py-1.5 bg-white/15 backdrop-blur-md border border-white/25 text-white rounded-full text-xs font-semibold uppercase tracking-wider mb-6">
+            {t('hero.badge', 'Premium Floor & Wall Tiling')}
+          </span>
 
-        <h1 className="font-serif text-4xl sm:text-6xl md:text-7xl font-semibold text-[#3D3229] tracking-tight leading-[1.15] mb-5">
-          {t('hero.titleLine1', 'Warm floors,')}<br />
-          {t('hero.titleLine2', 'beautiful')} <span className="text-[#C2784A] italic">{t('hero.titleLine2Highlight', 'walls')}</span>.
-        </h1>
+          <h1 className="font-serif text-4xl sm:text-6xl md:text-7xl font-semibold text-white tracking-tight leading-[1.15] mb-5 [text-shadow:0_2px_24px_rgba(0,0,0,0.25)]">
+            {t('hero.titleLine1', 'Warm floors,')}<br />
+            {t('hero.titleLine2', 'beautiful')} <span className="text-[#D4956A] italic">{t('hero.titleLine2Highlight', 'walls')}</span>.
+          </h1>
 
-        <p className="text-base sm:text-lg text-[#6B5D51] max-w-[560px] mx-auto mb-8 leading-relaxed">
-          {t('hero.description', 'We craft timeless surfaces that bring warmth and character to every space. From natural stone to artisanal porcelain — each tile tells a story of craftsmanship.')}
-        </p>
+          <p className="text-base sm:text-lg text-white/85 max-w-[560px] mx-auto mb-8 leading-relaxed">
+            {t('hero.description', 'We craft timeless surfaces that bring warmth and character to every space. From natural stone to artisanal porcelain — each tile tells a story of craftsmanship.')}
+          </p>
 
-        <div className="flex flex-wrap justify-center gap-3 sm:gap-4">
-          <button
-            onClick={() => onNavigate('tiles')}
-            className="inline-flex items-center gap-2 px-7 py-3 bg-[#C2784A] text-white rounded-full font-semibold text-sm sm:text-base hover:bg-[#A85D32] transition-all shadow-md hover:shadow-lg hover:-translate-y-0.5 cursor-pointer"
-          >
-            {t('hero.exploreCollection', 'Explore Collection')} <i className="fa-solid fa-arrow-right text-xs"></i>
-          </button>
-          <button
-            onClick={scrollToContact}
-            className="inline-flex items-center gap-2 px-7 py-3 bg-transparent border-2 border-[#E8DDD4] text-[#3D3229] rounded-full font-semibold text-sm sm:text-base hover:border-[#C2784A] hover:text-[#A85D32] hover:bg-[#FDFAF6] transition-all cursor-pointer"
-          >
-            {t('hero.getInTouch', 'Get in Touch')}
-          </button>
+          <div className="flex flex-wrap justify-center gap-3 sm:gap-4">
+            <button
+              onClick={() => onNavigate('tiles')}
+              className="inline-flex items-center gap-2 px-7 py-3 bg-[#C2784A] text-white rounded-full font-semibold text-sm sm:text-base hover:bg-[#A85D32] transition-all shadow-md hover:shadow-lg hover:-translate-y-0.5 cursor-pointer"
+            >
+              {t('hero.exploreCollection', 'Explore Collection')} <i className="fa-solid fa-arrow-right text-xs"></i>
+            </button>
+            <button
+              onClick={scrollToContact}
+              className="inline-flex items-center gap-2 px-7 py-3 bg-white/10 backdrop-blur-sm border-2 border-white/40 text-white rounded-full font-semibold text-sm sm:text-base hover:bg-white hover:text-[#A85D32] hover:border-white transition-all cursor-pointer"
+            >
+              {t('hero.getInTouch', 'Get in Touch')}
+            </button>
+          </div>
         </div>
       </div>
 

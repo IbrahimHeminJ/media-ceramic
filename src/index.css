@@ -101,6 +101,15 @@ html[dir="rtl"] .animate-drawer-slide-in {
   animation: filterSlideDown 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards;
 }
 
+@keyframes heroSlideZoom {
+  from { transform: scale(1); }
+  to { transform: scale(1.08); }
+}
+
+.animate-hero-slide-zoom {
+  animation: heroSlideZoom 7.5s ease-out forwards;
+}
+
 html {
   scroll-behavior: smooth;
   font-size: 16px;
