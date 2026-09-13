@@ -293,8 +293,8 @@ Every field below is **optional** — include only the ones you want to change.
 | `badge`          | text | e.g. `"featured"`, `"new"`, `"popular"`. Send as an empty value to clear it. |
 | `description`    | text | Tile description                                                             |
 | `thickness`      | text | e.g. `"9mm"`                                                                 |
-| `finish`         | text | e.g. `"Matte"`                                                               |
-| `slipResistance` | text | e.g. `"R10"`                                                                 |
+| `finish`         | text | e.g. `"Matte"`. Send as an empty value to clear it.                          |
+| `slipResistance` | text | e.g. `"R10"`. Send as an empty value to clear it.                            |
 | `usage`          | text | e.g. `"Floor & Wall"`                                                        |
 | `image`          | file | Replaces the tile's main image. Old file is removed after the update.       |
 | `pdf`            | file | Replaces the tile's spec sheet PDF. Old file is removed after the update.   |
@@ -305,8 +305,9 @@ Rules:
 - Every field except `badge` is required to be **non-blank** *if included* — you may
   omit `name`, but if you send it, it can't be an empty string.
 - `image` and `pdf` reuse the same file constraints as
-  [Create Tile](CREATE_TILE_API.md#file-constraints): images must be JPG/PNG (max
-  5 MB), the PDF must be `application/pdf` (max 20 MB).
+  [Create Tile](CREATE_TILE_API.md#file-constraints): images must be
+  JPG/JPEG/JFIF/PNG/WEBP/GIF/BMP/TIFF/HEIC/HEIF (max 5 MB), the PDF must be
+  `application/pdf` (max 20 MB).
 - Orientations and mockups are not editable through this endpoint.
 
 #### Example Request — rename only

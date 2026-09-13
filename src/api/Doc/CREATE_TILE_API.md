@@ -29,8 +29,8 @@ This is an **admin-only** endpoint.
 | `badge`          | text     | ❌       | e.g. `"featured"`, `"new"`, `"popular"`             |
 | `description`    | text     | ✅       |                                                     |
 | `thickness`      | text     | ✅       | e.g. `"9mm"`                                        |
-| `finish`         | text     | ✅       | e.g. `"Matte"`                                      |
-| `slipResistance` | text     | ✅       | e.g. `"R10"`                                        |
+| `finish`         | text     | ❌       | e.g. `"Matte"`                                      |
+| `slipResistance` | text     | ❌       | e.g. `"R10"`                                        |
 | `usage`          | text     | ✅       | e.g. `"Floor & Wall"`                               |
 | `image`          | file     | ✅       | Main tile swatch image                             |
 | `pdf`            | file     | ✅       | Tile spec sheet PDF                                |
@@ -81,7 +81,7 @@ mockups[1].image
 
 | Constraint         | Images (`image`, orientation/mockup images) | PDF (`pdf`)       |
 | ------------------ | -------------------------------------------- | ----------------- |
-| Allowed types       | `image/jpeg`, `image/png` (JPG/PNG)          | `application/pdf` |
+| Allowed types       | `image/jpeg`, `image/jfif`, `image/png`, `image/webp`, `image/gif`, `image/bmp`, `image/tiff`, `image/heic`, `image/heif` (JPG/JPEG/JFIF/PNG/WEBP/GIF/BMP/TIFF/HEIC/HEIF) | `application/pdf` |
 | Max size            | 5 MB                                          | 20 MB              |
 
 Files are validated **before** anything is written to disk or saved to the
@@ -217,7 +217,7 @@ limit.
   "timestamp": "2026-09-10T14:00:00",
   "status": 400,
   "error": "Bad Request",
-  "message": "Invalid image file type for 'swatch.webp'. Allowed types: JPG, PNG",
+  "message": "Invalid image file type for 'swatch.avif'. Allowed types: JPG, JPEG, JFIF, PNG, WEBP, GIF, BMP, TIFF, HEIC, HEIF",
   "path": "/api/tiles"
 }
 ```

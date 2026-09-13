@@ -2,6 +2,108 @@ import React, { useState, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { resolveAssetUrl } from '../api/client';
 
+const FIXED_SIZES = [
+  '10x10', '10x20', '15x15', '20x20', '30x30', '30x60',
+  '40x40', '45x45', '60x60', '60x120', '80x80', '120x120',
+];
+const FIXED_TYPES = [
+  'ceramic', 'porcelain', 'marble', 'granite', 'travertine', 'slate',
+  'mosaic', 'glass', 'terrazzo', 'quarry', 'cement', 'limestone',
+];
+const FIXED_COLORS = [
+  'white', 'gray', 'beige', 'black', 'cream', 'charcoal',
+  'brown', 'taupe', 'blue', 'green', 'terracotta',
+];
+const COLOR_HEX = {
+  white: '#F5F2ED',
+  gray: '#5C554D',
+  beige: '#D9C8B4',
+  black: '#211D19',
+  cream: '#F2E8D5',
+  charcoal: '#3A352F',
+  brown: '#B8957A',
+  taupe: '#A89885',
+  blue: '#7A92A3',
+  green: '#8A9678',
+  terracotta: '#C2784A',
+};
+
+function titleCase(value) {
+  return value
+    .split(/\s+/)
+    .filter(Boolean)
+    .map((w) => w.charAt(0).toUpperCase() + w.slice(1).toLowerCase())
+    .join(' ');
+}
+
+/** Best-effort check for whether a raw string is a browser-recognized CSS color (e.g. "gold", "ivory"). */
+function isValidCssColor(value) {
+  if (typeof document === 'undefined') return false;
+  const el = document.createElement('option');
+  el.style.color = '';
+  el.style.color = value;
+  return el.style.color !== '';
+}
+
+/**
+ * Distinct values of `field` across `tiles` that don't already (case-insensitively)
+ * match one of `fixedList`'s entries — used to extend Size/Type filter options with
+ * whatever an admin has actually entered beyond the curated list, sorted A-Z.
+ */
+function collectUniqueExtras(tiles, field, fixedList) {
+  const fixedLower = new Set(fixedList.map((v) => v.toLowerCase()));
+  const seen = new Map(); // lowercase -> first-seen original casing
+  (tiles || []).forEach((tile) => {
+    const raw = (tile[field] || '').trim();
+    if (!raw) return;
+    const lower = raw.toLowerCase();
+    if (fixedLower.has(lower)) return;
+    if (!seen.has(lower)) seen.set(lower, raw);
+  });
+  return [...seen.values()].sort((a, b) => a.localeCompare(b));
+}
+
+/**
+ * Distinct brand values across `tiles`, deduped case-insensitively against a
+ * 'media' baseline that's always present even when the catalog is empty/new.
+ */
+function collectBrandOptions(tiles) {
+  const seen = new Map();
+  seen.set('media', 'media');
+  (tiles || []).forEach((tile) => {
+    const raw = (tile.brand || '').trim();
+    if (!raw) return;
+    const lower = raw.toLowerCase();
+    if (!seen.has(lower)) seen.set(lower, raw);
+  });
+  const rest = [...seen.entries()]
+    .filter(([lower]) => lower !== 'media')
+    .map(([, raw]) => raw)
+    .sort((a, b) => a.localeCompare(b));
+  return ['media', ...rest];
+}
+
+/**
+ * A tile's free-text `color` field (e.g. "golden white", "white, grey, blue") is
+ * matched against the fixed palette by substring, not equality — see filteredTiles.
+ * Any tile whose color text contains NONE of the fixed words gets its raw color
+ * text added here as its own filter option, so it stays findable.
+ */
+function collectColorExtras(tiles, fixedColors) {
+  const seen = new Map(); // lowercase value -> display label
+  (tiles || []).forEach((tile) => {
+    const raw = (tile.color || '').trim();
+    if (!raw) return;
+    const lower = raw.toLowerCase();
+    const matchesFixed = fixedColors.some((c) => lower.includes(c));
+    if (matchesFixed) return;
+    if (!seen.has(lower)) seen.set(lower, raw);
+  });
+  return [...seen.entries()]
+    .sort((a, b) => a[0].localeCompare(b[0]))
+    .map(([value, raw]) => ({ value, label: titleCase(raw) }));
+}
+
 /**
  * Filter controls component.
  * Can be rendered vertically (for desktop sidebar) or in a multi-column grid (for mobile/tablet expandable section).
@@ -247,9 +349,9 @@ export default function Tiles({ tiles = [], onSelectTile }) {
 
   const filteredTiles = useMemo(() => {
     return (tiles || []).filter((tile) => {
-      if (filters.size !== 'all' && tile.size !== filters.size) return false;
-      if (filters.color !== 'all' && tile.color !== filters.color) return false;
-      if (filters.type !== 'all' && tile.type !== filters.type) return false;
+      if (filters.size !== 'all' && tile.size.toLowerCase() !== filters.size.toLowerCase()) return false;
+      if (filters.color !== 'all' && !tile.color.toLowerCase().includes(filters.color.toLowerCase())) return false;
+      if (filters.type !== 'all' && tile.type.toLowerCase() !== filters.type.toLowerCase()) return false;
       if (
         filters.brand !== 'all' &&
         tile.brand.toLowerCase() !== filters.brand.toLowerCase()
@@ -265,23 +367,28 @@ export default function Tiles({ tiles = [], onSelectTile }) {
     });
   }, [filters, tiles]);
 
-  const sizeOptions = ['all', '30x30', '60x60', '30x60', '20x120'];
-  const colorOptions = [
-    { value: 'all', label: t('tiles.allColors', 'All Colors') },
-    { value: 'white', label: t('tiles.colors.white', 'White'), hex: '#f5f2ed' },
-    { value: 'beige', label: t('tiles.colors.beige', 'Beige'), hex: '#d9c8b4' },
-    { value: 'gray', label: t('tiles.colors.gray', 'Gray'), hex: '#5c554d' },
-    { value: 'brown', label: t('tiles.colors.brown', 'Brown'), hex: '#b8957a' },
-    { value: 'terracotta', label: t('tiles.colors.terracotta', 'Terracotta'), hex: '#c2784a' },
-  ];
-  const typeOptions = ['all', 'porcelain', 'ceramic', 'marble', 'terrazzo'];
-  const brandOptions = [
-    'all',
-    'Media Ceramic co.',
-    'marazzi',
-    'florim',
-    'casalgrande',
-  ];
+  const sizeOptions = useMemo(
+    () => ['all', ...FIXED_SIZES, ...collectUniqueExtras(tiles, 'size', FIXED_SIZES)],
+    [tiles]
+  );
+  const typeOptions = useMemo(
+    () => ['all', ...FIXED_TYPES, ...collectUniqueExtras(tiles, 'type', FIXED_TYPES)],
+    [tiles]
+  );
+  const brandOptions = useMemo(() => ['all', ...collectBrandOptions(tiles)], [tiles]);
+  const colorOptions = useMemo(() => {
+    const fixed = FIXED_COLORS.map((value) => ({
+      value,
+      label: t(`tiles.colors.${value}`, titleCase(value)),
+      hex: COLOR_HEX[value],
+    }));
+    const extras = collectColorExtras(tiles, FIXED_COLORS).map(({ value, label }) => ({
+      value,
+      label,
+      hex: isValidCssColor(value) ? value : undefined,
+    }));
+    return [{ value: 'all', label: t('tiles.allColors', 'All Colors') }, ...fixed, ...extras];
+  }, [tiles, t]);
 
   return (
     <section className="animate-fade-slide-in flex-1 w-full max-w-[1400px] mx-auto px-4 sm:px-8 py-8 sm:py-12">

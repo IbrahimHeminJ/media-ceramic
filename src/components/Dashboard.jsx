@@ -1682,7 +1682,7 @@ function TileForm({ initialData = null, onSubmit, onCancel, tiles = [] }) {
                     <i className="fa-solid fa-upload text-[10px]"></i> Upload Image File
                     <input
                       type="file"
-                      accept="image/jpeg,image/png"
+                      accept="image/jpeg,image/jfif,image/png,image/webp,image/gif,image/bmp,image/tiff,image/heic,image/heif"
                       onChange={(e) => handleFileSelect(e, setImageFile, setImagePreviewUrl)}
                       className="hidden"
                     />
@@ -1777,7 +1777,7 @@ function TileForm({ initialData = null, onSubmit, onCancel, tiles = [] }) {
                     <i className="fa-solid fa-camera"></i>
                     <input
                       type="file"
-                      accept="image/jpeg,image/png"
+                      accept="image/jpeg,image/jfif,image/png,image/webp,image/gif,image/bmp,image/tiff,image/heic,image/heif"
                       onChange={(e) => handleOrientationFileChange(idx, e)}
                       className="hidden"
                     />
@@ -1863,7 +1863,7 @@ function TileForm({ initialData = null, onSubmit, onCancel, tiles = [] }) {
                       <i className="fa-solid fa-camera"></i>
                       <input
                         type="file"
-                        accept="image/jpeg,image/png"
+                        accept="image/jpeg,image/jfif,image/png,image/webp,image/gif,image/bmp,image/tiff,image/heic,image/heif"
                         onChange={(e) => handleMockupFileChange(idx, e)}
                         className="hidden"
                       />
